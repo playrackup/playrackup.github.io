@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RACK UP 🎱</title>
+
+<style>
+:root{
+  --bg:#08090c;
+  --panel:#13151b;
+  --panel-soft:#101217;
+  --panel-dim:#0d0f14;
+  --text:#ffffff;
+  --muted:rgba(255,255,255,.72);
+  --muted2:rgba(255,255,255,.42);
+  --muted3:rgba(255,255,255,.26);
+  --line:rgba(255,255,255,.08);
+  --line-dim:rgba(255,255,255,.04);
+
+  --active-card:#20232d;
+  --active-card2:#1b1e27;
+
+  --idBg:linear-gradient(180deg,#5a4110,#2a1f0f);
+  --idBorder:rgba(242,201,76,.45);
+  --idText:#fff3c0;
+  --idSub:rgba(255,244,199,.88);
+
+  --scoreBg:linear-gradient(180deg,#2b2f3f,#1a1d25);
+  --scoreBorder:rgba(255,255,255,.11);
+
+  --comingText:#ffcf66;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100vh;
+  overflow:hidden;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+}
+
+@supports (height: 100dvh){
+  html,body{ height:100dvh; }
+}
+
+body{
+  position:fixed;
+  inset:0;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.app{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  padding:
+    calc(env(safe-area-inset-top) + 6px)
+    calc(env(safe-area-inset-right) + 12px)
+    calc(env(safe-area-inset-bottom) + 10px)
+    calc(env(safe-area-inset-left) + 12px);
+  gap:8px;
+  overflow:hidden;
+}
+
+/* ===== 上部 ===== */
+.hero{
+  flex:0 0 auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  min-height:0;
+}
+
+.logoRow{
+  width:100%;
+  display:flex;
+  align-items:center;
+
+  justify-content:flex-start;
+
+  gap:10px;
+  min-height:0;
+}
+
+.logo{
+  display:block;
+  width:min(64vw, 340px);
+  max-height:44px;
+  object-fit:contain;
+  min-width:0;
+}
+
+.heroAction{
+  display:none;
+}
+
+.tag{
+  margin:0;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.14em;
+  color:var(--muted);
+  text-transform:uppercase;
+  line-height:1;
+}
+
+/* ===== メイン ===== */
+.main{
+  flex:1 1 auto;
+  min-height:0;
+  display:grid;
+  gap:8px;
+}
+
+/* ===== タイル共通 ===== */
+.tile{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  text-align:left;
+  min-width:0;
+  min-height:0;
+  border-radius:16px;
+  padding:12px 14px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+}
+
+.tileTitle{
+  font-size:18px;
+  font-weight:900;
+  line-height:1.08;
+  word-break:break-word;
+}
+
+.tileSub{
+  margin-top:5px;
+  font-size:11px;
+  line-height:1.25;
+  color:var(--muted);
+}
+
+.tileSoon{
+  background:var(--panel-dim);
+  border:1px solid var(--line-dim);
+}
+
+.tileSoon .tileTitle{
+  font-size:16px;
+  color:rgba(255,255,255,.83);
+}
+
+.tileSoon .tileSub{
+  color:var(--muted3);
+}
+
+.coming{
+  display:inline-block;
+  margin-left:7px;
+  font-size:10px;
+  font-weight:900;
+  color:rgba(255,207,102,.65);
+  letter-spacing:.05em;
+  vertical-align:middle;
+}
+
+/* ===== 実装済み ===== */
+.idTile{
+  background:var(--idBg);
+  border:1px solid var(--idBorder);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    0 8px 22px rgba(0,0,0,.22);
+}
+
+.idTop{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+.idBadge{
+  flex:0 0 auto;
+  font-size:22px;
+  line-height:1;
+}
+
+.idTile .tileTitle{
+  color:var(--idText);
+  font-size:19px;
+}
+
+.idNote{
+  margin-top:5px;
+  font-size:12px;
+  line-height:1.28;
+  color:var(--idSub);
+}
+
+.scoreTile{
+  background:var(--scoreBg);
+  border:1px solid var(--scoreBorder);
+}
+
+.scoreTile .tileTitle{
+  font-size:19px;
+}
+
+/* ===== 下部リンク ===== */
+.links{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px 18px;
+  align-items:center;
+  padding-top:2px;
+}
+
+.link{
+  font-size:14px;
+  color:rgba(255,255,255,.42);
+  font-weight:700;
+  white-space:nowrap;
+}
+
+/* ===== 縦画面 ===== */
+@media (orientation: portrait){
+  .main{
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:
+      .90fr
+      1.05fr
+      1.05fr
+      1.05fr
+      auto;
+    gap:8px;
+  }
+
+  .idTile{
+    grid-column:1 / 3;
+    grid-row:1 / 2;
+    padding:10px 14px;
+  }
+
+  .scoreTile{ grid-column:1 / 2; grid-row:2 / 3; }
+  .pairTile{ grid-column:2 / 3; grid-row:2 / 3; }
+  .rotationTile{ grid-column:1 / 2; grid-row:3 / 4; }
+  .japanTile{ grid-column:2 / 3; grid-row:3 / 4; }
+  .bowlliardTile{ grid-column:1 / 2; grid-row:4 / 5; }
+  .drillTile{ grid-column:2 / 3; grid-row:4 / 5; }
+
+  .links{
+    grid-column:1 / 3;
+    grid-row:5 / 6;
+  }
+
+  .tile{
+    padding:14px 14px;
+  }
+
+  .tileSoon,
+  .scoreTile{
+    justify-content:center;
+  }
+}
+
+/* ===== 横画面 ===== */
+@media (orientation: landscape){
+  .app{
+    padding:
+      calc(env(safe-area-inset-top) + 6px)
+      calc(env(safe-area-inset-right) + 12px)
+      calc(env(safe-area-inset-bottom) + 8px)
+      calc(env(safe-area-inset-left) + 12px);
+    gap:8px;
+  }
+
+  .hero{
+    align-items:stretch;
+    gap:2px;
+  }
+
+  .logoRow{
+    justify-content:flex-start;
+    align-items:center;
+    gap:16px;
+    padding:0 6px;
+  }
+
+  .logo{
+    width:min(22vw, 190px);
+    max-height:38px;
+    flex:0 0 auto;
+  }
+
+  .tag{
+    margin:0;
+    flex:0 0 auto;
+    font-size:11px;
+    line-height:1;
+    white-space:nowrap;
+    letter-spacing:.14em;
+  }
+
+  .heroAction{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    flex:1 1 auto;
+    margin-left:auto;
+    padding-left:24px;
+  }
+
+  .heroCardBtn{
+    font-size:18px;
+    padding:8px 16px;
+    border-radius:16px;
+  }
+
+  .idTile{
+    display:none;
+  }
+
+  .main{
+    grid-template-columns:1.08fr 1fr 1fr;
+    grid-template-rows:
+      1fr
+      1fr
+      auto;
+    gap:12px;
+  }
+
+  .scoreTile{ grid-column:1 / 2; grid-row:1 / 2; }
+  .pairTile{ grid-column:2 / 3; grid-row:1 / 2; }
+  .rotationTile{ grid-column:3 / 4; grid-row:1 / 2; }
+
+  .japanTile{ grid-column:1 / 2; grid-row:2 / 3; }
+  .bowlliardTile{ grid-column:2 / 3; grid-row:2 / 3; }
+  .drillTile{ grid-column:3 / 4; grid-row:2 / 3; }
+
+  .links{
+    grid-column:1 / 4;
+    grid-row:3 / 4;
+    gap:12px 26px;
+  }
+
+  .tile{
+    padding:18px 18px;
+    border-radius:18px;
+    min-height:0;
+  }
+
+  .tileTitle{
+    font-size:21px;
+  }
+
+  .scoreTile .tileTitle{
+    font-size:22px;
+  }
+
+  .tileSoon .tileTitle{
+    font-size:18px;
+  }
+
+  .tileSub{
+    font-size:12px;
+  }
+
+  .coming{
+    display:block;
+    margin:6px 0 0;
+    font-size:10px;
+  }
+
+  .link{
+    font-size:15px;
+  }
+}
+
+/* ===== 横画面上部の ID / My Card ボタン ===== */
+.heroCardBtn{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  max-width:100%;
+  padding:8px 14px;
+  border-radius:16px;
+  background:var(--idBg);
+  border:1px solid var(--idBorder);
+  color:var(--idText);
+  font-weight:900;
+  font-size:18px;
+  line-height:1;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    0 8px 22px rgba(0,0,0,.20);
+}
+
+.heroCardBtn .mini{
+  font-size:22px;
+  line-height:1;
+}
+
+.heroCardBtn .label{
+  white-space:nowrap;
+}
+
+/* ===== 小さめ端末 ===== */
+@media (max-height: 740px){
+  .logo{ max-height:40px; }
+  .main{ gap:7px; }
+  .tile{ padding:12px 12px; }
+  .tileTitle{ font-size:16px; }
+  .scoreTile .tileTitle{ font-size:17px; }
+  .tileSoon .tileTitle{ font-size:15px; }
+  .idTile .tileTitle{ font-size:17px; }
+  .idNote{ font-size:11px; }
+  .tileSub{ font-size:10px; }
+  .link{ font-size:13px; }
+  .heroCardBtn{ font-size:16px; padding:7px 12px; }
+  .heroCardBtn .mini{ font-size:20px; }
+}
+
+@media (max-height: 640px){
+  .app{
+    gap:6px;
+    padding:
+      calc(env(safe-area-inset-top) + 5px)
+      calc(env(safe-area-inset-right) + 10px)
+      calc(env(safe-area-inset-bottom) + 8px)
+      calc(env(safe-area-inset-left) + 10px);
+  }
+
+  .logo{ max-height:34px; }
+  .tag{ font-size:10px; }
+
+  .main{ gap:6px; }
+
+  .tile{
+    padding:10px 11px;
+    border-radius:14px;
+  }
+
+  .tileTitle{ font-size:15px; }
+  .scoreTile .tileTitle{ font-size:16px; }
+  .tileSoon .tileTitle{ font-size:14px; }
+  .tileSub{ font-size:9px; }
+  .idTile .tileTitle{ font-size:16px; }
+  .idNote{ font-size:10px; }
+  .link{ font-size:12px; }
+
+  .heroCardBtn{
+    font-size:14px;
+    padding:6px 10px;
+    border-radius:14px;
+  }
+  .heroCardBtn .mini{ font-size:18px; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <header class="hero">
+    <div class="logoRow">
+
+
+<img src="/assets/images/logo/rack_up_logo.png" alt="RACK UP" class="logo">
+
+
+      <p class="tag">Pool Tools</p>
+
+      <div class="heroAction">
+        <a id="heroCardLink" class="heroCardBtn" href="/rackup/id/">
+          <span class="mini">🆔</span>
+          <span class="label" id="heroCardLabel">My ID 作成</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- 縦画面用 ID / My Card -->
+    <a id="mainCardLink" class="tile idTile" href="/rackup/id/">
+      <div class="idTop">
+        <span class="idBadge">🆔</span>
+        <div class="tileTitle" id="mainCardLabel">My ID 作成</div>
+      </div>
+      <div class="idNote" id="mainCardNote">My IDを作成して記録しましょう。</div>
+    </a>
+
+    <!-- 実装済み -->
+    <a class="tile scoreTile" href="/rackup/score/">
+      <div class="tileTitle">スコアボード</div>
+      <div class="tileSub">ホーム画面に追加推奨</div>
+    </a>
+
+    <!-- 未実装 -->
+    <a class="tile tileSoon pairTile" href="/rackup/pair/">
+      <div class="tileTitle">ペアマッチ <span class="coming">COMING SOON</span></div>
+      <div class="tileSub">準備中</div>
+    </a>
+
+    <a class="tile tileSoon rotationTile" href="/rackup/rotation/">
+      <div class="tileTitle">ローテーション <span class="coming">COMING SOON</span></div>
+      <div class="tileSub">準備中</div>
+    </a>
+
+    <a class="tile tileSoon japanTile" href="/rackup/japan9/">
+      <div class="tileTitle">ジャパンナインボール <span class="coming">COMING SOON</span></div>
+      <div class="tileSub">準備中</div>
+    </a>
+
+    <a class="tile tileSoon bowlliardTile" href="/rackup/bowlliard/">
+      <div class="tileTitle">ボーラード <span class="coming">COMING SOON</span></div>
+      <div class="tileSub">準備中</div>
+    </a>
+
+    <a class="tile tileSoon drillTile" href="/rackup/drill/">
+      <div class="tileTitle">ドリルメーカー <span class="coming">COMING SOON</span></div>
+      <div class="tileSub">準備中</div>
+    </a>
+
+    <!-- 下部 -->
+    <div class="links">
+      <a class="link" href="/rackup/readme/">README / 使い方</a>
+      <a class="link" href="/rackup/contact/">問い合わせ</a>
+      <a class="link" href="/rackup/links/">リンク集</a>
+      <a class="link" href="https://nabechaya.example.com">nabechaya</a>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  const ID_KEY = "rackup_my_id";
+
+  const heroLink = document.getElementById("heroCardLink");
+  const heroLabel = document.getElementById("heroCardLabel");
+
+  const mainLink = document.getElementById("mainCardLink");
+  const mainLabel = document.getElementById("mainCardLabel");
+  const mainNote = document.getElementById("mainCardNote");
+
+  function hasMyId() {
+    const raw = localStorage.getItem(ID_KEY);
+    return !!raw && raw !== "null" && raw !== "undefined" && raw !== "";
+  }
+
+  function applyCardState() {
+    const created = hasMyId();
+
+    if (created) {
+      if (heroLink) heroLink.href = "/rackup/mycard/";
+      if (heroLabel) heroLabel.textContent = "My Card";
+
+      if (mainLink) mainLink.href = "/rackup/mycard/";
+      if (mainLabel) mainLabel.textContent = "My Card";
+      if (mainNote) mainNote.textContent = "プロフィールや記録を確認できます。";
+    } else {
+      if (heroLink) heroLink.href = "/rackup/id/";
+      if (heroLabel) heroLabel.textContent = "My ID 作成";
+
+      if (mainLink) mainLink.href = "/rackup/id/";
+      if (mainLabel) mainLabel.textContent = "My ID 作成";
+      if (mainNote) mainNote.textContent = "My IDを作成して記録しましょう。";
+    }
+  }
+
+  applyCardState();
+})();
+</script>
+</body>
+</html>
