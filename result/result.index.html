@@ -1,0 +1,501 @@
+<!doctype html>
+
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/icon/icon-1024.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>RACK UP | 対戦結果</title>
+
+  <link rel="stylesheet" href="../assets/common/common.css">
+  <!-- LZ圧縮ライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+
+  <style>
+    html, body {
+      min-height: 100svh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      margin: 0;
+    }
+
+    .page {
+      width: min(100%, 480px);
+      margin: 0 auto;
+      padding:
+        calc(env(safe-area-inset-top)    + 70px)
+        calc(env(safe-area-inset-right)  + 16px)
+        calc(env(safe-area-inset-bottom) + 32px)
+        calc(env(safe-area-inset-left)   + 16px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ===== 保存バナー ===== */
+    .savedBanner {
+      background: rgba(76,175,114,.15);
+      border: 1px solid rgba(76,175,114,.35);
+      border-radius: var(--r-md);
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--felt-green);
+      text-align: center;
+      display: none;
+    }
+
+    .savedBanner.show { display: block; }
+
+    /* ===== カード共通 ===== */
+    .resultCard {
+      background: linear-gradient(160deg, var(--panel), var(--panel-2) 50%, var(--panel-3));
+      border: 1px solid var(--line);
+      border-radius: var(--r-xl);
+      padding: 18px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cardLabel {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    /* ===== モード表示 ===== */
+    .modeTag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: rgba(200,151,42,.15);
+      border: 1px solid rgba(200,151,42,.3);
+      color: var(--gold-light);
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    /* ===== プレイヤー結果行 ===== */
+    .playerRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .playerRow:last-child { border-bottom: none; }
+
+    .playerLeft {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .rankBadge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 900;
+      flex-shrink: 0;
+      background: var(--panel-2);
+      color: var(--muted);
+    }
+
+    .rankBadge.winner {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #0a0800;
+    }
+
+    .playerName {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .playerScore {
+      font-size: 22px;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: var(--text);
+    }
+
+    .playerScore.winner { color: var(--gold-light); }
+
+    /* ===== 詳細グリッド ===== */
+    .detailGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .detailItem {
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      padding: 10px 12px;
+    }
+
+    .detailLabel {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .detailValue {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    /* ===== 満足度 ===== */
+    .satisfactionRow {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .satTag {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .satTag.active {
+      background: rgba(126,224,255,.12);
+      border-color: rgba(126,224,255,.35);
+      color: var(--felt-blue);
+    }
+
+    /* ===== 相手の戦績 ===== */
+    .opponentCard {
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      padding: 12px 14px;
+      margin-top: 8px;
+    }
+
+    .opponentName {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .opponentStats {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .opponentNetwork {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+
+    /* ===== ボタン ===== */
+    .btnSaveId {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: var(--r-lg);
+      background: linear-gradient(135deg, var(--id-purple), var(--id-purple-2));
+      color: #fff;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .btnHome {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      background: transparent;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ===== エラー ===== */
+    .errorWrap {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .errorWrap h2 { color: var(--text); margin-bottom: 8px; }
+  </style>
+
+</head>
+<body>
+
+  <div class="page" id="pageContent">
+    <!-- JSで生成 -->
+  </div>
+
+  <script src="../assets/common/common.js"></script>
+
+  <script>
+    /* ヘッダー：戻るのみ */
+    createHeader({
+      showBack:     true,
+      showSound:    false,
+      showSettings: false
+    });
+
+    /* ============================================================
+       データキー定義（圧縮用短縮キー）
+       m  = mode（スコアボード種別）
+       p  = players（プレイヤー配列）
+         n  = name（ID）
+         s  = score（スコア）
+         w  = wins（勝数）
+         r  = race（レース数）
+         wn = winner（勝者フラグ）
+         h  = handicap（ハンデ）
+         bs = bowlliard score（ボーラードハイスコア）
+         ba = bowlliard avg（ボーラードアベレージ）
+         op = opponents（相手の対戦履歴1層）
+           i  = id
+           md = mode
+           w  = wins
+           l  = losses
+       gm = games（何試合したか）
+       sf = satisfaction（満足度タグ配列）
+       ts = timestamp
+       ============================================================ */
+
+    const STORAGE_KEY = "rackupProfileV5";
+    const HISTORY_KEY = "rackupHistory";
+
+    /* URLからデータ取得・解凍 */
+    function getResultData() {
+      const params = new URLSearchParams(window.location.search);
+      const compressed = params.get("d");
+      if (!compressed) return null;
+      try {
+        const json = LZString.decompressFromEncodedURIComponent(compressed);
+        return JSON.parse(json);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    /* ローカルストレージに対戦履歴を保存 */
+    function saveToHistory(data) {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        const history = raw ? JSON.parse(raw) : [];
+        history.unshift({ ...data, savedAt: Date.now() });
+        /* 最新50件のみ保持 */
+        if (history.length > 50) history.splice(50);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    /* モード名変換 */
+    function modeName(m) {
+      const map = {
+        score:      "スコアボード",
+        pair:       "ペアマッチ",
+        rotation:   "ローテーション",
+        japan9:     "ジャパンナインボール",
+        bowlliard:  "ボーラード",
+        drill:      "ドリルメーカー"
+      };
+      return map[m] || m;
+    }
+
+    /* 満足度タグ定義 */
+    const SAT_TAGS = [
+      { key: "fun",     label: "楽しかった 😄" },
+      { key: "learn",   label: "学びあった 📚" },
+      { key: "close",   label: "接戦だった ⚡" },
+      { key: "rematch", label: "またやりたい 🔥" },
+      { key: "reflect", label: "反省点あり 🤔" }
+    ];
+
+    /* ページ描画 */
+    function render(data) {
+      const page = document.getElementById("pageContent");
+
+      /* 保存バナー */
+      const saved = saveToHistory(data);
+      const bannerHtml = `
+        <div class="savedBanner ${saved ? "show" : ""}">
+          ✅ 対戦結果をこの端末に記録しました
+        </div>
+      `;
+
+      /* モードタグ */
+      const modeHtml = `<div class="modeTag">${modeName(data.m)}</div>`;
+
+      /* プレイヤー結果 */
+      const players = data.p || [];
+      const sorted  = [...players].sort((a, b) => b.s - a.s);
+
+      const playerRowsHtml = sorted.map((p, i) => {
+        const isWinner = p.wn;
+        return `
+          <div class="playerRow">
+            <div class="playerLeft">
+              <div class="rankBadge ${isWinner ? "winner" : ""}">${isWinner ? "🏆" : i + 1}</div>
+              <div class="playerName">${p.n}</div>
+            </div>
+            <div class="playerScore ${isWinner ? "winner" : ""}">${p.s}</div>
+          </div>
+        `;
+      }).join("");
+
+      /* 詳細グリッド */
+      const games   = data.gm || "-";
+      const handicap = players.map(p => p.h ? `${p.n} ＋${p.h}` : "").filter(Boolean).join(" / ") || "なし";
+
+      const detailHtml = `
+        <div class="detailGrid">
+          <div class="detailItem">
+            <div class="detailLabel">試合数</div>
+            <div class="detailValue">${games}</div>
+          </div>
+          <div class="detailItem">
+            <div class="detailLabel">ハンデ</div>
+            <div class="detailValue" style="font-size:14px">${handicap}</div>
+          </div>
+          ${players[0]?.bs ? `
+          <div class="detailItem">
+            <div class="detailLabel">ボーラード最高</div>
+            <div class="detailValue">${players[0].bs}</div>
+          </div>
+          <div class="detailItem">
+            <div class="detailLabel">アベレージ</div>
+            <div class="detailValue">${players[0].ba || "-"}</div>
+          </div>
+          ` : ""}
+        </div>
+      `;
+
+      /* 満足度タグ */
+      const sf = data.sf || [];
+      const satHtml = sf.length > 0 ? `
+        <div style="margin-top:12px">
+          <div class="cardLabel">この試合は</div>
+          <div class="satisfactionRow">
+            ${SAT_TAGS.filter(t => sf.includes(t.key)).map(t =>
+              `<div class="satTag active">${t.label}</div>`
+            ).join("")}
+          </div>
+        </div>
+      ` : "";
+
+      /* 相手の戦績（1層） */
+      const opponentCardsHtml = players.map(p => {
+        if (!p.op || p.op.length === 0) return "";
+        const opList = p.op.slice(0, 5).map(o =>
+          `<div>${o.i} — ${modeName(o.md)} ${o.w}勝${o.l}敗</div>`
+        ).join("");
+        return `
+          <div class="opponentCard">
+            <div class="opponentName">${p.n} の対戦履歴</div>
+            <div class="opponentStats">${opList}</div>
+          </div>
+        `;
+      }).join("");
+
+      /* My IDがあるか確認 */
+      const hasId = (() => {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return false;
+          return !!(JSON.parse(raw)?.id);
+        } catch (e) { return false; }
+      })();
+
+      const idBtnHtml = !hasId ? `
+        <button class="btnSaveId" onclick="location.href='../id/'">
+          🆔 My IDを作って記録する
+        </button>
+      ` : "";
+
+      page.innerHTML = `
+        ${bannerHtml}
+
+        <div class="resultCard">
+          <div class="cardLabel">MATCH RESULT</div>
+          ${modeHtml}
+          ${playerRowsHtml}
+          ${detailHtml}
+          ${satHtml}
+        </div>
+
+        ${opponentCardsHtml ? `
+        <div class="resultCard">
+          <div class="cardLabel">対戦ネットワーク</div>
+          ${opponentCardsHtml}
+        </div>
+        ` : ""}
+
+        ${idBtnHtml}
+
+        <button class="btnHome" onclick="location.href='../'">
+          ホームへ
+        </button>
+      `;
+    }
+
+    /* エラー表示 */
+    function renderError() {
+      document.getElementById("pageContent").innerHTML = `
+        <div class="errorWrap">
+          <h2>データが見つかりません</h2>
+          <p>QRコードが正しく読み取れなかった可能性があります。</p>
+          <button class="btnHome" onclick="location.href='../'">ホームへ</button>
+        </div>
+      `;
+    }
+
+
+/* 起動 */
+document.addEventListener("DOMContentLoaded", () => {
+  const data = getResultData();
+  if (data) {
+    render(data);
+  } else {
+    renderError();
+  }
+});
+
+
+  </script>
+
+</body>
+</html>
