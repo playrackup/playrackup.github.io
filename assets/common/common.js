@@ -7,11 +7,11 @@ RACK UP — common.js
 サウンド状態（localStorage で永続化）
 ============================================================ */
 function isSoundOn() {
-return localStorage.getItem(“ru_sound”) !== “off”;
+return localStorage.getItem("ru_sound") !== "off";
 }
 
 function setSoundOn(val) {
-localStorage.setItem(“ru_sound”, val ? “on” : “off”);
+localStorage.setItem("ru_sound", val ? "on" : "off");
 }
 
 /* ============================================================
@@ -29,10 +29,10 @@ showSettings = true,
 onSettings   = null
 } = {}) {
 
-const soundIcon = () => isSoundOn() ? “🔔” : “🔕”;
+const soundIcon = () => isSoundOn() ? "🔔" : "🔕";
 
-const header = document.createElement(“header”);
-header.className = “app-header”;
+const header = document.createElement("header");
+header.className = "app-header";
 
 header.innerHTML = `${showBack ?`<button class="header-btn" onclick="goBack()" aria-label="戻る">‹</button>`:`<div class="header-btn" style="visibility:hidden"></div>`
 }
@@ -52,14 +52,14 @@ header.innerHTML = `${showBack ?`<button class="header-btn" onclick="goBack()" a
 `;
 
 document.body.prepend(header);
-document.body.classList.add(“has-header”);
+document.body.classList.add("has-header");
 
 /* ⚙️ボタンに各ページのハンドラをセット */
 if (showSettings) {
-const settingsBtn = document.getElementById(“ru-settingsBtn”);
+const settingsBtn = document.getElementById("ru-settingsBtn");
 if (settingsBtn) {
-settingsBtn.addEventListener(“click”, () => {
-if (typeof onSettings === “function”) {
+settingsBtn.addEventListener("click", () => {
+if (typeof onSettings === "function") {
 onSettings();
 }
 /* onSettings未指定の場合は何もしない（将来の共通設定ページ用に予約） */
@@ -75,7 +75,7 @@ function goBack() {
 if (history.length > 1) {
 history.back();
 } else {
-location.href = “/”;
+location.href = "/";
 }
 }
 
@@ -86,8 +86,8 @@ function toggleSound() {
 const next = !isSoundOn();
 setSoundOn(next);
 
-const btn = document.getElementById(“ru-soundBtn”);
-if (btn) btn.textContent = next ? “🔔” : “🔕”;
+const btn = document.getElementById("ru-soundBtn");
+if (btn) btn.textContent = next ? "🔔" : "🔕";
 }
 
 /* ============================================================

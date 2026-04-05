@@ -5,10 +5,10 @@ RACK UP — result-qr.js
 
 使い方：
 showResultQR({
-mode:    “score”,
+mode:    "score",
 players: [
 {
-n:  “FlowCue22”,   // My ID
+n:  "FlowCue22",   // My ID
 s:  5,             // スコア
 w:  3,             // 累計勝数
 r:  5,             // レース数
@@ -17,18 +17,18 @@ h:  0,             // ハンデ
 bs: 120,           // ボーラードハイスコア（任意）
 ba: 98,            // ボーラードアベレージ（任意）
 op: [              // 相手の対戦履歴1層（任意）
-{ i:“ShotNeo11”, md:“score”, w:2, l:1 }
+{ i:"ShotNeo11", md:"score", w:2, l:1 }
 ]
 }
 ],
 games:        3,       // 何試合したか
-satisfaction: [“fun”,“learn”]  // 満足度タグ
+satisfaction: ["fun","learn"]  // 満足度タグ
 });
 ============================================================ */
 
 (function(global) {
 
-const RESULT_BASE = “https://playrackup.github.io/result/”;
+const RESULT_BASE = "https://playrackup.github.io/result/";
 
 /* ============================================================
 データ圧縮（短縮キー → LZ圧縮 → URLエンコード）
@@ -73,7 +73,7 @@ return `${RESULT_BASE}?d=${d}`;
 モーダルHTML（初回のみ生成）
 ============================================================ */
 function ensureModal() {
-if (document.getElementById(“rqModal”)) return;
+if (document.getElementById("rqModal")) return;
 
 ```
 const style = document.createElement("style");
