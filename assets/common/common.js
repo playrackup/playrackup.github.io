@@ -34,7 +34,7 @@ const soundIcon = () => isSoundOn() ? "🔔" : "🔕";
 const header = document.createElement("header");
 header.className = "app-header";
 
-header.innerHTML = `${showBack ?`<button class="header-btn" onclick="goBack()" aria-label="戻る">‹</button>`:`<div class="header-btn" style="visibility:hidden"></div>`
+header.innerHTML = `${showBack ?`<button class="header-btn" onclick="goBack()" aria-label=<"戻る">＜</button>`:`<div class="header-btn" style="visibility:hidden"></div>`
 }
 
 
