@@ -11,19 +11,9 @@
   <title>RACK UP | 対戦結果</title>
 
   <link rel="stylesheet" href="../assets/common/common.css">
-  <!-- LZ圧縮ライブラリ -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 
   <style>
-    html, body {
-      min-height: 100svh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-ui);
-      margin: 0;
-    }
-
-    .page {
+    .result-page {
       width: min(100%, 480px);
       margin: 0 auto;
       padding:
@@ -48,7 +38,6 @@
       text-align: center;
       display: none;
     }
-
     .savedBanner.show { display: block; }
 
     /* ===== カード共通 ===== */
@@ -60,7 +49,6 @@
       position: relative;
       overflow: hidden;
     }
-
     .cardLabel {
       font-size: 11px;
       font-weight: 800;
@@ -93,250 +81,144 @@
       padding: 10px 0;
       border-bottom: 1px solid var(--line);
     }
-
     .playerRow:last-child { border-bottom: none; }
-
-    .playerLeft {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
+    .playerLeft { display: flex; align-items: center; gap: 10px; }
     .rankBadge {
-      width: 28px;
-      height: 28px;
+      width: 28px; height: 28px;
       border-radius: 50%;
-      display: grid;
-      place-items: center;
-      font-size: 13px;
-      font-weight: 900;
-      flex-shrink: 0;
-      background: var(--panel-2);
-      color: var(--muted);
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 900; flex-shrink: 0;
+      background: var(--panel-2); color: var(--muted);
     }
-
     .rankBadge.winner {
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
       color: #0a0800;
     }
-
-    .playerName {
-      font-size: 16px;
-      font-weight: 800;
-    }
-
-    .playerScore {
-      font-size: 22px;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      color: var(--text);
-    }
-
+    .playerName  { font-size: 16px; font-weight: 800; }
+    .playerScore { font-size: 22px; font-weight: 900; font-family: var(--font-mono); color: var(--text); }
     .playerScore.winner { color: var(--gold-light); }
 
     /* ===== 詳細グリッド ===== */
-    .detailGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .detailItem {
-      background: var(--bg-surface);
-      border: 1px solid var(--line);
-      border-radius: var(--r-sm);
-      padding: 10px 12px;
-    }
-
-    .detailLabel {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .detailValue {
-      font-size: 18px;
-      font-weight: 900;
-    }
+    .detailGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+    .detailItem { background: var(--bg-surface); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 12px; }
+    .detailLabel { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+    .detailValue { font-size: 18px; font-weight: 900; }
 
     /* ===== 満足度 ===== */
-    .satisfactionRow {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-
-    .satTag {
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 999px;
-      background: var(--bg-surface);
-      border: 1px solid var(--line);
-      color: var(--muted);
-    }
-
-    .satTag.active {
-      background: rgba(126,224,255,.12);
-      border-color: rgba(126,224,255,.35);
-      color: var(--felt-blue);
-    }
+    .satisfactionRow { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .satTag { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; background: var(--bg-surface); border: 1px solid var(--line); color: var(--muted); }
+    .satTag.active { background: rgba(126,224,255,.12); border-color: rgba(126,224,255,.35); color: var(--felt-blue); }
 
     /* ===== 相手の戦績 ===== */
-    .opponentCard {
-      background: var(--bg-surface);
-      border: 1px solid var(--line);
-      border-radius: var(--r-md);
-      padding: 12px 14px;
-      margin-top: 8px;
-    }
+    .opponentCard { background: var(--bg-surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; margin-top: 8px; }
+    .opponentName { font-size: 13px; font-weight: 800; margin-bottom: 6px; color: var(--text); }
+    .opponentStats { font-size: 12px; color: var(--muted); line-height: 1.8; }
 
-    .opponentName {
-      font-size: 13px;
-      font-weight: 800;
-      margin-bottom: 6px;
-      color: var(--text);
+    /* ===== QRシェアボタン ===== */
+    .btnQR {
+      width: 100%; padding: 18px; border: none;
+      border-radius: var(--r-lg);
+      background: linear-gradient(135deg, var(--felt-blue), #a8ffd7);
+      color: #061218;
+      font-size: 17px; font-weight: 900;
+      cursor: pointer; font-family: var(--font-ui);
+      transition: opacity .18s, transform .18s;
     }
+    .btnQR:active { opacity: .85; transform: scale(.97); }
 
-    .opponentStats {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    .opponentNetwork {
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid var(--line);
-      font-size: 11px;
-      color: var(--muted-2);
-    }
-
-    /* ===== ボタン ===== */
+    /* ===== My ID作成ボタン ===== */
     .btnSaveId {
-      width: 100%;
-      padding: 18px;
-      border: none;
+      width: 100%; padding: 18px; border: none;
       border-radius: var(--r-lg);
       background: linear-gradient(135deg, var(--id-purple), var(--id-purple-2));
       color: #fff;
-      font-size: 17px;
-      font-weight: 900;
-      cursor: pointer;
-      margin-top: 4px;
+      font-size: 17px; font-weight: 900;
+      cursor: pointer; font-family: var(--font-ui);
+      transition: opacity .18s, transform .18s;
     }
+    .btnSaveId:active { opacity: .85; transform: scale(.97); }
 
+    /* ===== ホームボタン ===== */
     .btnHome {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid var(--line-2);
-      border-radius: var(--r-lg);
-      background: transparent;
-      color: var(--muted);
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
+      width: 100%; padding: 14px;
+      border: 1px solid var(--line-2); border-radius: var(--r-lg);
+      background: transparent; color: var(--muted);
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; font-family: var(--font-ui);
+      transition: opacity .18s;
     }
+    .btnHome:active { opacity: .7; }
 
     /* ===== エラー ===== */
-    .errorWrap {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-    }
-
+    .errorWrap { text-align: center; padding: 60px 20px; color: var(--muted); }
     .errorWrap h2 { color: var(--text); margin-bottom: 8px; }
   </style>
 
 </head>
 <body>
 
-  <div class="page" id="pageContent">
-    <!-- JSで生成 -->
-  </div>
+  <div class="result-page" id="pageContent"></div>
+
+  <!--
+    読み込み順序（重要）:
+    1. LZString — result-qr.js と result/index.html 両方が使う
+    2. common.js — createHeader / goBack / toggleSound を提供
+    3. result-qr.js — ResultQR.show / ResultQR.hide を提供
+    4. インラインscript — 上記3つがすべて揃った後に実行
+  -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 
   <script src="../assets/common/common.js"></script>
 
+  <script src="../assets/common/result-qr.js"></script>
+
   <script>
-    /* ヘッダー：戻るのみ */
-    createHeader({
-      showBack:     true,
-      showSound:    false,
-      showSettings: false
-    });
-
     /* ============================================================
-       データキー定義（圧縮用短縮キー）
-       m  = mode（スコアボード種別）
-       p  = players（プレイヤー配列）
-         n  = name（ID）
-         s  = score（スコア）
-         w  = wins（勝数）
-         r  = race（レース数）
-         wn = winner（勝者フラグ）
-         h  = handicap（ハンデ）
-         bs = bowlliard score（ボーラードハイスコア）
-         ba = bowlliard avg（ボーラードアベレージ）
-         op = opponents（相手の対戦履歴1層）
-           i  = id
-           md = mode
-           w  = wins
-           l  = losses
-       gm = games（何試合したか）
-       sf = satisfaction（満足度タグ配列）
-       ts = timestamp
-       ============================================================ */
-
+       定数
+    ============================================================ */
     const STORAGE_KEY = "rackupProfileV5";
     const HISTORY_KEY = "rackupHistory";
 
-    /* URLからデータ取得・解凍 */
+    /* ============================================================
+       ユーティリティ関数（DOMに触らないのでトップレベルOK）
+    ============================================================ */
     function getResultData() {
-      const params = new URLSearchParams(window.location.search);
+      const params     = new URLSearchParams(window.location.search);
       const compressed = params.get("d");
       if (!compressed) return null;
       try {
         const json = LZString.decompressFromEncodedURIComponent(compressed);
         return JSON.parse(json);
       } catch (e) {
+        console.error("[RACK UP] LZString decode error:", e);
         return null;
       }
     }
 
-    /* ローカルストレージに対戦履歴を保存 */
     function saveToHistory(data) {
       try {
-        const raw = localStorage.getItem(HISTORY_KEY);
+        const raw     = localStorage.getItem(HISTORY_KEY);
         const history = raw ? JSON.parse(raw) : [];
         history.unshift({ ...data, savedAt: Date.now() });
-        /* 最新50件のみ保持 */
         if (history.length > 50) history.splice(50);
         localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
         return true;
-      } catch (e) {
-        return false;
-      }
+      } catch (e) { return false; }
     }
 
-    /* モード名変換 */
     function modeName(m) {
       const map = {
-        score:      "スコアボード",
-        pair:       "ペアマッチ",
-        rotation:   "ローテーション",
-        japan9:     "ジャパンナインボール",
-        bowlliard:  "ボーラード",
-        drill:      "ドリルメーカー"
+        score:     "スコアボード",
+        pair:      "ペアマッチ",
+        rotation:  "ローテーション",
+        japan9:    "ジャパンナインボール",
+        bowlliard: "ボーラード",
+        drill:     "ドリルメーカー"
       };
       return map[m] || m;
     }
 
-    /* 満足度タグ定義 */
     const SAT_TAGS = [
       { key: "fun",     label: "楽しかった 😄" },
       { key: "learn",   label: "学びあった 📚" },
@@ -345,41 +227,58 @@
       { key: "reflect", label: "反省点あり 🤔" }
     ];
 
-    /* ページ描画 */
+    /* ============================================================
+       ページ描画
+    ============================================================ */
     function render(data) {
       const page = document.getElementById("pageContent");
 
-      /* 保存バナー */
+      /* 履歴保存 */
       const saved = saveToHistory(data);
-      const bannerHtml = `
-        <div class="savedBanner ${saved ? "show" : ""}">
-          ✅ 対戦結果をこの端末に記録しました
-        </div>
-      `;
 
-      /* モードタグ */
-      const modeHtml = `<div class="modeTag">${modeName(data.m)}</div>`;
+      /* My IDの有無 */
+      const hasId = (() => {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          return !!(raw && JSON.parse(raw)?.id);
+        } catch (e) { return false; }
+      })();
 
-      /* プレイヤー結果 */
+      /* プレイヤーをスコア降順でソート */
       const players = data.p || [];
       const sorted  = [...players].sort((a, b) => b.s - a.s);
 
-      const playerRowsHtml = sorted.map((p, i) => {
-        const isWinner = p.wn;
-        return `
-          <div class="playerRow">
-            <div class="playerLeft">
-              <div class="rankBadge ${isWinner ? "winner" : ""}">${isWinner ? "🏆" : i + 1}</div>
-              <div class="playerName">${p.n}</div>
-            </div>
-            <div class="playerScore ${isWinner ? "winner" : ""}">${p.s}</div>
-          </div>
-        `;
-      }).join("");
+      /* ---- HTML生成 ---- */
 
-      /* 詳細グリッド */
-      const games   = data.gm || "-";
+      const bannerHtml = saved ? `
+        <div class="savedBanner show">✅ 対戦結果をこの端末に記録しました</div>
+      ` : "";
+
+      const playerRowsHtml = sorted.map((p, i) => `
+        <div class="playerRow">
+          <div class="playerLeft">
+            <div class="rankBadge ${p.wn ? "winner" : ""}">
+              ${p.wn ? "🏆" : i + 1}
+            </div>
+            <div class="playerName">${p.n}</div>
+          </div>
+          <div class="playerScore ${p.wn ? "winner" : ""}">${p.s}</div>
+        </div>
+      `).join("");
+
+      const games    = data.gm || "-";
       const handicap = players.map(p => p.h ? `${p.n} ＋${p.h}` : "").filter(Boolean).join(" / ") || "なし";
+
+      const bowlliardHtml = players[0]?.bs ? `
+        <div class="detailItem">
+          <div class="detailLabel">ボーラード最高</div>
+          <div class="detailValue">${players[0].bs}</div>
+        </div>
+        <div class="detailItem">
+          <div class="detailLabel">アベレージ</div>
+          <div class="detailValue">${players[0].ba || "-"}</div>
+        </div>
+      ` : "";
 
       const detailHtml = `
         <div class="detailGrid">
@@ -391,21 +290,11 @@
             <div class="detailLabel">ハンデ</div>
             <div class="detailValue" style="font-size:14px">${handicap}</div>
           </div>
-          ${players[0]?.bs ? `
-          <div class="detailItem">
-            <div class="detailLabel">ボーラード最高</div>
-            <div class="detailValue">${players[0].bs}</div>
-          </div>
-          <div class="detailItem">
-            <div class="detailLabel">アベレージ</div>
-            <div class="detailValue">${players[0].ba || "-"}</div>
-          </div>
-          ` : ""}
+          ${bowlliardHtml}
         </div>
       `;
 
-      /* 満足度タグ */
-      const sf = data.sf || [];
+      const sf      = data.sf || [];
       const satHtml = sf.length > 0 ? `
         <div style="margin-top:12px">
           <div class="cardLabel">この試合は</div>
@@ -417,62 +306,67 @@
         </div>
       ` : "";
 
-      /* 相手の戦績（1層） */
       const opponentCardsHtml = players.map(p => {
-        if (!p.op || p.op.length === 0) return "";
-        const opList = p.op.slice(0, 5).map(o =>
-          `<div>${o.i} — ${modeName(o.md)} ${o.w}勝${o.l}敗</div>`
-        ).join("");
+        if (!p.op?.length) return "";
         return `
           <div class="opponentCard">
             <div class="opponentName">${p.n} の対戦履歴</div>
-            <div class="opponentStats">${opList}</div>
+            <div class="opponentStats">
+              ${p.op.slice(0, 5).map(o =>
+                `<div>${o.i} — ${modeName(o.md)} ${o.w}勝${o.l}敗</div>`
+              ).join("")}
+            </div>
           </div>
         `;
       }).join("");
-
-      /* My IDがあるか確認 */
-      const hasId = (() => {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return false;
-          return !!(JSON.parse(raw)?.id);
-        } catch (e) { return false; }
-      })();
-
-      const idBtnHtml = !hasId ? `
-        <button class="btnSaveId" onclick="location.href='../id/'">
-          🆔 My IDを作って記録する
-        </button>
-      ` : "";
 
       page.innerHTML = `
         ${bannerHtml}
 
         <div class="resultCard">
           <div class="cardLabel">MATCH RESULT</div>
-          ${modeHtml}
+          <div class="modeTag">${modeName(data.m)}</div>
           ${playerRowsHtml}
           ${detailHtml}
           ${satHtml}
         </div>
 
         ${opponentCardsHtml ? `
-        <div class="resultCard">
-          <div class="cardLabel">対戦ネットワーク</div>
-          ${opponentCardsHtml}
-        </div>
+          <div class="resultCard">
+            <div class="cardLabel">対戦ネットワーク</div>
+            ${opponentCardsHtml}
+          </div>
         ` : ""}
 
-        ${idBtnHtml}
+        <button class="btnQR" id="btnShowQR">
+          📷 QRコードでシェア
+        </button>
+
+        ${!hasId ? `
+          <button class="btnSaveId" onclick="location.href='../id/'">
+            🆔 My IDを作って記録する
+          </button>
+        ` : ""}
 
         <button class="btnHome" onclick="location.href='../'">
           ホームへ
         </button>
       `;
+
+      /* QRボタンにResultQRを紐づけ */
+      document.getElementById("btnShowQR").addEventListener("click", () => {
+        ResultQR.show({
+          mode:         data.m,
+          players:      data.p,
+          games:        data.gm,
+          satisfaction: data.sf
+        });
+      });
     }
 
-    /* エラー表示 */
+    /* ============================================================
+       エラー表示
+    ============================================================ */
     function renderError() {
       document.getElementById("pageContent").innerHTML = `
         <div class="errorWrap">
@@ -483,18 +377,28 @@
       `;
     }
 
+    /* ============================================================
+       起動 ── DOMContentLoaded の中にすべての DOM 操作を集約
+       createHeader() は document.body.prepend() を呼ぶため
+       必ずここで実行すること
+    ============================================================ */
+    document.addEventListener("DOMContentLoaded", () => {
 
-/* 起動 */
-document.addEventListener("DOMContentLoaded", () => {
-  const data = getResultData();
-  if (data) {
-    render(data);
-  } else {
-    renderError();
-  }
-});
+      /* ヘッダー生成（DOM確定後） */
+      createHeader({
+        showBack:     true,
+        showSound:    false,
+        showSettings: false
+      });
 
-
+      /* データ取得・描画 */
+      const data = getResultData();
+      if (data) {
+        render(data);
+      } else {
+        renderError();
+      }
+    });
   </script>
 
 </body>
