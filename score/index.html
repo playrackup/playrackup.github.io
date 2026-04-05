@@ -175,7 +175,6 @@
       margin-bottom: 4px;
     }
 
-    /* CONTINUEボタン：大きく目立つ */
     .btnContinue {
       width: 100%; padding: 22px; border: none;
       border-radius: 20px;
@@ -189,7 +188,6 @@
     }
     .btnContinue:active { transform: scale(.97); opacity: .88; }
 
-    /* 結果シェアボタン：控えめ */
     .btnShareResult {
       width: 100%; padding: 14px;
       border: 1px solid rgba(255,255,255,.12);
@@ -280,7 +278,7 @@
     }
 
     /* ============================================================
-       満足度入力シート（結果シェア前）
+       満足度入力シート
        ============================================================ */
     .satOverlay {
       position: fixed; inset: 0; z-index: 21000;
@@ -414,29 +412,20 @@
     </div>
   </div>
 
-  <!-- 共通JS -->
-
-  <script src="../assets/common/common.js"></script>
-
-  <!-- LZ圧縮ライブラリ -->
+  <!--
+    読み込み順序（重要）:
+    1. LZString — result-qr.js が使うので必ず先に
+    2. common.js — createHeader を提供
+    3. result-qr.js — ResultQR.show を提供
+  -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 
-  <!-- リザルトQR共通JS -->
+  <script src="../assets/common/common.js"></script>
 
   <script src="../assets/common/result-qr.js"></script>
 
   <script>
-    /* ============================================================
-       ヘッダー生成
-       ============================================================ */
-    createHeader({
-      showBack:     true,
-      showSound:    true,
-      showSettings: true,
-      onSettings:   () => openSettings()
-    });
-
     /* ============================================================
        スコアボード
        ============================================================ */
@@ -515,7 +504,6 @@
 
     function handleScore(id, delta) {
       if (state.winnerId) {
-        /* 勝者確定済みの状態でタップ → コンティニューシートを出す */
         showContinueSheet();
         return;
       }
@@ -525,7 +513,6 @@
         state.winnerId = id;
         save();
         renderAll();
-        /* 少し遅らせてコンティニューシートを表示 */
         setTimeout(() => {
           const winCard = document.querySelector('.card.win');
           if (winCard) winCard.classList.add('shaking');
@@ -552,7 +539,6 @@
       $("continueOverlay").classList.remove("show");
     }
 
-    /* CONTINUE：累積勝利+1してスコアリセット・続行 */
     function doContinue() {
       hideContinueSheet();
       state.players.forEach(p => {
@@ -564,7 +550,6 @@
       renderAll();
     }
 
-    /* 結果をシェア → 満足度入力へ */
     function doOpenSat() {
       hideContinueSheet();
       buildSatGrid();
@@ -607,30 +592,19 @@
       $("gamesInput").value = 1;
     }
 
-    /* QR生成 */
     function doGenQR() {
       $("satOverlay").classList.remove("show");
 
       const activePlayers = state.players.slice(0, state.playerCount);
       const games = parseInt($("gamesInput").value) || 1;
 
-      /* My IDからプロフィール取得 */
-      let myProfile = null;
-      try {
-        const raw = localStorage.getItem("rackupProfileV5");
-        if (raw) myProfile = JSON.parse(raw);
-      } catch(e) {}
-
-      const players = activePlayers.map(p => {
-        const isWinner = p.id === state.winnerId;
-        return {
-          n:  p.name,
-          s:  p.score,
-          w:  p.wins,
-          r:  p.race,
-          wn: isWinner ? 1 : 0
-        };
-      });
+      const players = activePlayers.map(p => ({
+        n:  p.name,
+        s:  p.score,
+        w:  p.wins,
+        r:  p.race,
+        wn: p.id === state.winnerId ? 1 : 0
+      }));
 
       ResultQR.show({
         mode:         "score",
@@ -639,7 +613,6 @@
         satisfaction: selectedSat
       });
 
-      /* シェア後もCONTINUEと同じ処理でリセット */
       state.players.forEach(p => {
         if (p.id === state.winnerId) p.wins++;
         p.score = 0;
@@ -709,6 +682,18 @@
         else handleScore(id, dy < -40 ? 1 : -1);
       }, { passive: true });
     }
+
+    /* ============================================================
+       起動
+       createHeader() は document.body.prepend() を呼ぶため
+       他のDOM操作より先・かつ body末尾のscript内で呼ぶ
+       ============================================================ */
+    createHeader({
+      showBack:     true,
+      showSound:    true,
+      showSettings: true,
+      onSettings:   () => openSettings()
+    });
 
     load();
   </script>
