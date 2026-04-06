@@ -1,77 +1,113 @@
 /* ============================================================
    RACK UP — Design System  common.css
    ナベクリエイト / playrackup.github.io
+
+   【役割】
+   全ページ共通のデザイン変数・レイアウト・UIパーツを一元管理。
+   ホーム以外の全アプリはこのファイルに従うことで
+   統一感・保守性を確保する。
+
+   【対応環境】
+   - iPhone  最新Safari   ← フル最適化
+   - iPad Air1 iOS12/Safari12 ← 最低限動く・崩れない
+
+   【フォールバック戦略】
+   古い値を先に書き、新しい値を後に書く。
+   対応端末が後の値に自動的に上書きする。
+     例) height: 100vh;   ← iOS12フォールバック
+         height: 100dvh;  ← iOS15+が上書き
    ============================================================ */
 
 
 /* ============================================================
-   1. カラー変数
+   1. デザイントークン（カラー・サイズ・フォント変数）
+   ここの値を変えるだけで全体のデザインが変わる。
+   新しいページを作る際はここの変数を使うこと。
    ============================================================ */
 :root {
 
-  /* --- 背景 --- */
-  --bg:         #08090c;
-  --bg-base:    #07090d;
-  --bg-mid:     #0d1018;
-  --bg-surface: #111520;
+  /* --- 背景レイヤー ---
+     bg → bg-base → bg-mid → bg-surface の順に明るくなる。
+     画面の奥行き感を出すために使い分ける。       */
+  --bg:         #08090c;   /* 最も暗い。html/bodyの地色 */
+  --bg-base:    #07090d;   /* ほぼbgと同じ。微妙な差が欲しい時 */
+  --bg-mid:     #0d1018;   /* 中間層。区切りなどに */
+  --bg-surface: #111520;   /* 一番手前の背景 */
 
-  /* --- パネル --- */
-  --panel:      #13151b;
-  --panel-soft: #101217;
-  --panel-dim:  #0d0f14;
-  --panel-2:    #1c2233;
-  --panel-3:    #111825;
-  --active-card:#20232d;
-  --active-card2:#1b1e27;
+  /* --- パネル・カード背景 ---
+     パネル系は主にタイル・カードの背景色。
+     panel < panel-2 < active-card の順に明るい。  */
+  --panel:       #13151b;  /* 標準パネル */
+  --panel-soft:  #101217;  /* やや暗めのパネル */
+  --panel-dim:   #0d0f14;  /* Coming Soonなど非アクティブ用 */
+  --panel-2:     #1c2233;  /* 入力欄・やや明るいパネル */
+  --panel-3:     #111825;  /* グラデーション用第3色 */
+  --active-card: #20232d;  /* タップ時・選択状態のパネル */
+  --active-card2:#1b1e27;  /* active-cardの第2バリエーション */
 
-  /* --- ボーダー --- */
-  --line:       rgba(255,255,255,.08);
-  --line-2:     rgba(255,255,255,.13);
-  --line-dim:   rgba(255,255,255,.04);
+  /* --- ボーダー ---
+     全て白の透明度違い。数字が大きいほど目立つ。 */
+  --line:     rgba(255,255,255,.08);  /* 標準ボーダー（薄め） */
+  --line-2:   rgba(255,255,255,.13);  /* やや目立つボーダー */
+  --line-dim: rgba(255,255,255,.04);  /* ほぼ見えないボーダー */
 
-  /* --- テキスト --- */
-  --text:       #ffffff;
-  --muted:      rgba(255,255,255,.72);
-  --muted2:     rgba(255,255,255,.42);
-  --muted3:     rgba(255,255,255,.26);
+  /* --- テキスト ---
+     白の透明度で強弱をつける。
+     text > muted > muted2 > muted3 の順に薄くなる。 */
+  --text:   #ffffff;              /* メインテキスト */
+  --muted:  rgba(255,255,255,.72);/* サブテキスト */
+  --muted2: rgba(255,255,255,.42);/* 補足テキスト・リンク */
+  --muted3: rgba(255,255,255,.26);/* 非アクティブテキスト */
 
-  /* --- ゴールド・IDアクセント --- */
-  --gold:           #c8972a;
-  --gold-light:     #e8b84b;
-  --gold-dim:       rgba(200,151,42,.18);
-  --gold-glow:      rgba(232,184,75,.10);
-  --idBg:           linear-gradient(180deg,#5a4110,#2a1f0f);
-  --idBorder:       rgba(242,201,76,.45);
-  --idText:         #fff3c0;
-  --idSub:          rgba(255,244,199,.88);
-  --comingText:     #ffcf66;
+  /* --- ゴールド・IDアクセント ---
+     My ID / My Card まわりのブランドカラー。
+     ビリヤードのゴールドトロフィーイメージ。      */
+  --gold:        #c8972a;              /* ゴールド基本色 */
+  --gold-light:  #e8b84b;              /* 明るいゴールド（グラデ用） */
+  --gold-dim:    rgba(200,151,42,.18); /* 薄いゴールド（背景グロー） */
+  --gold-glow:   rgba(232,184,75,.10); /* ゴールドの光（背景グロー） */
+  --idBg:        linear-gradient(180deg,#5a4110,#2a1f0f); /* IDタイル背景 */
+  --idBorder:    rgba(242,201,76,.45); /* IDタイルボーダー */
+  --idText:      #fff3c0;              /* IDタイルテキスト */
+  --idSub:       rgba(255,244,199,.88);/* IDタイルサブテキスト */
+  --comingText:  #ffcf66;              /* COMING SOONバッジ色 */
 
-  /* --- スコアタイル --- */
-  --scoreBg:    linear-gradient(180deg,#2b2f3f,#1a1d25);
-  --scoreBorder:rgba(255,255,255,.11);
+  /* --- スコアボードタイル ---
+     ホーム画面のスコアボードへのリンクタイル専用。 */
+  --scoreBg:     linear-gradient(180deg,#2b2f3f,#1a1d25);
+  --scoreBorder: rgba(255,255,255,.11);
 
-  /* --- ラシャ水色 --- */
-  --felt-blue:      #7ee0ff;
-  --felt-blue-dim:  rgba(126,224,255,.12);
+  /* --- ラシャ水色 ---
+     QR生成ボタン・フォーカス・アクセントに使う
+     ビリヤード台ラシャのイメージカラー。          */
+  --felt-blue:     #7ee0ff;
+  --felt-blue-dim: rgba(126,224,255,.12);
 
-  /* --- ラシャ緑 --- */
+  /* --- ラシャ緑 ---
+     ビリヤード台の緑ラシャ。将来の拡張用。        */
   --felt-green:     #4caf72;
   --felt-green-dim: rgba(76,175,114,.10);
 
-  /* --- ID専用パープル --- */
-  --id-purple:  #7c3aed;
-  --id-purple-2:#6d28d9;
+  /* --- ID専用パープル ---
+     My IDページのアクセントカラー。               */
+  --id-purple:   #7c3aed;
+  --id-purple-2: #6d28d9;
 
-  /* --- 危険 --- */
-  --danger:     #ff5c5c;
+  /* --- 危険色 ---
+     リセットボタン・エラー表示などに使う。        */
+  --danger: #ff5c5c;
 
-  /* --- シャドウ --- */
-  --shadow-sm:  0 4px 12px rgba(0,0,0,.30);
-  --shadow-md:  0 12px 28px rgba(0,0,0,.40);
-  --shadow-lg:  0 24px 50px rgba(0,0,0,.50);
-  --shadow-gold:0 8px 24px rgba(200,151,42,.18);
+  /* --- シャドウ ---
+     sm < md < lg の順に強くなる。
+     gold は金色グローシャドウ（ゴールドボタン用）。*/
+  --shadow-sm:   0 4px 12px rgba(0,0,0,.30);
+  --shadow-md:   0 12px 28px rgba(0,0,0,.40);
+  --shadow-lg:   0 24px 50px rgba(0,0,0,.50);
+  --shadow-gold: 0 8px 24px rgba(200,151,42,.18);
 
-  /* --- 角丸 --- */
+  /* --- 角丸 ---
+     xs < sm < md < lg < xl < 2xl の6段階。
+     ボタン → r-lg/r-md、カード → r-2xl が標準。  */
   --r-xs:  8px;
   --r-sm:  12px;
   --r-md:  16px;
@@ -79,19 +115,56 @@
   --r-xl:  26px;
   --r-2xl: 32px;
 
-  /* --- フォント --- */
+  /* --- フォント ---
+     font-ui  : UI全般。iOSはヒラギノ/SF、Androidはシステム。
+     font-mono: ID表示・数字などの等幅フォント。    */
   --font-ui:   -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* --- トランジション --- */
+  /* --- トランジション ---
+     ease : バウンス感のあるイージング（気持ちよさ重視）。
+     dur  : 標準アニメーション時間。                */
   --ease: cubic-bezier(.22,.68,0,1.2);
   --dur:  .18s;
+
+  /* --- safe-area フォールバック値 ---
+     【重要】iOS12以前はenv()に未対応のため、
+     ここで固定値を設定しておく。
+     iOS13以降は下の @supports ブロックが実値に上書きする。
+
+     --sat = safe-area-inset-top    (ノッチ上部)
+     --sar = safe-area-inset-right  (横画面時の右側)
+     --sab = safe-area-inset-bottom (ホームバー下部)
+     --sal = safe-area-inset-left   (横画面時の左側)
+
+     使い方例:
+       padding-top: calc(var(--sat) + 6px);
+  ---------------------------------------- */
+  --sat: 20px;  /* top フォールバック（ステータスバー分） */
+  --sar:  0px;  /* right フォールバック */
+  --sab: 10px;  /* bottom フォールバック（ホームバー分） */
+  --sal:  0px;  /* left フォールバック */
+}
+
+/* env()対応環境（iOS13+）では実際のsafe-area値で上書き。
+   @supports で囲むことでiOS12が無視してくれる。          */
+@supports (padding-top: env(safe-area-inset-top)) {
+  :root {
+    --sat: env(safe-area-inset-top,    20px);
+    --sar: env(safe-area-inset-right,   0px);
+    --sab: env(safe-area-inset-bottom, 10px);
+    --sal: env(safe-area-inset-left,    0px);
+  }
 }
 
 
 /* ============================================================
    2. リセット・ベース
+   全要素共通の初期化。
    ============================================================ */
+
+/* box-sizing: border-boxでpaddingをサイズに含める。
+   -webkit-tap-highlight-colorでタップ時の青枠を消す。 */
 *, *::before, *::after {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -104,77 +177,177 @@ html, body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased; /* フォントのアンチエイリアス */
 }
 
+/* リンクの下線と色継承をリセット */
 a {
   color: inherit;
   text-decoration: none;
 }
 
+/* フォームパーツにもfont-familyを継承させる */
 input, button, textarea, select {
   font-family: inherit;
 }
 
 
 /* ============================================================
-   3. ヘッダー（common.jsと連携・サブ画面用）
+   3. フルスクリーン基盤（.fs-root）
+   【使い方】html または body に .fs-root を付ける。
+   スコアボードなどフルスクリーン占有アプリ用の基礎。
+
+   height の二重書きについて:
+     100vh  → iOS12フォールバック（アドレスバーを含む高さ）
+     100dvh → iOS15+が上書き（アドレスバー伸縮に追従する動的vh）
+              dvhがないとアドレスバーの出し入れで画面が振動する。
+   ============================================================ */
+.fs-root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;   /* iOS12フォールバック */
+  height: 100dvh;  /* iOS15+が上書き */
+  overflow: hidden;
+  position: fixed; /* スクロールを完全に固定 */
+  top: 0;
+  left: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+}
+
+
+/* ============================================================
+   4. 共通ヘッダー（.app-header）
+   【使い方】common.js の createHeader() が自動生成する。
+   各ページで直接書く必要はない。
+
+   構造:
+     .app-header
+       ├ .header-btn（戻るボタン or 非表示のスペーサー）
+       └ .header-right
+           ├ #ru-soundBtn（サウンドボタン）
+           └ #ru-settingsBtn（設定ボタン）
+
+   高さ計算:
+     safe-area-top（ノッチ）+ 56px（ボタンエリア）= ヘッダー全高
+
+   backdrop-filterについて:
+     iOS12では効かないが、背景色で代替されるため表示は崩れない。
    ============================================================ */
 .app-header {
   position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 1000;
-  height: calc(env(safe-area-inset-top) + 56px);
-  padding-top: env(safe-area-inset-top);
-  padding-left:  calc(env(safe-area-inset-left)  + 12px);
-  padding-right: calc(env(safe-area-inset-right) + 12px);
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* モーダルより下、コンテンツより上 */
+
+  height: 76px;                    /* フォールバック: 20px + 56px */
+  height: calc(var(--sat) + 56px); /* safe-area対応端末が上書き */
+
+  padding-top: 20px;               /* フォールバック */
+  padding-top: var(--sat);         /* safe-area対応端末が上書き */
+  padding-left:  12px;             /* フォールバック */
+  padding-left:  calc(var(--sal) + 12px);
+  padding-right: 12px;             /* フォールバック */
+  padding-right: calc(var(--sar) + 12px);
+
+  display: -webkit-flex;
   display: flex;
+  -webkit-align-items: center;
   align-items: center;
+  -webkit-justify-content: space-between;
   justify-content: space-between;
-  background: rgba(8,9,12,.85);
+
+  background: rgba(8,9,12,.92);
+  -webkit-backdrop-filter: blur(16px); /* iOS13+: 磨りガラス効果 */
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
 }
 
+/* ヘッダーがある画面のコンテンツ余白を一元管理。
+   【重要】スコアボードを含む全アプリはここに従う。
+   各ページで個別にpaddingを書かなくてよい。
+
+   padding-top の計算:
+     safe-area-top + 56px（ヘッダー）+ 6px（余白）
+
+   二重書きの理由:
+     1行目（固定値）→ iOS12フォールバック
+     2行目（calc）  → safe-area対応端末が上書き            */
 .has-header main,
 .has-header .page-body {
-  padding-top: calc(env(safe-area-inset-top) + 56px);
+  padding-top:    76px;                          /* フォールバック */
+  padding-top:    calc(var(--sat) + 56px + 6px); /* safe-area対応が上書き */
+  padding-bottom: 10px;                          /* フォールバック */
+  padding-bottom: calc(var(--sab) + 6px);
+  padding-left:   6px;                           /* フォールバック */
+  padding-left:   calc(var(--sal) + 6px);
+  padding-right:  6px;                           /* フォールバック */
+  padding-right:  calc(var(--sar) + 6px);
 }
 
+/* 横画面はiPhoneのホームバーが左右に移動するため
+   safe-areaが左右に広がる。それに合わせてpaddingを調整。 */
+@media (orientation: landscape) {
+  .has-header main,
+  .has-header .page-body {
+    padding-left:  50px;                    /* フォールバック */
+    padding-left:  calc(var(--sal) + 6px);
+    padding-right: 50px;                    /* フォールバック */
+    padding-right: calc(var(--sar) + 6px);
+  }
+}
+
+/* ヘッダーボタン（戻る・サウンド・設定）共通スタイル。
+   44x44px はAppleのタップ推奨最小サイズ。              */
 .header-btn {
   width: 44px;
   height: 44px;
   border-radius: var(--r-sm);
-  display: grid;
-  place-items: center;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
   font-size: 20px;
   background: var(--panel);
   border: 1px solid var(--line-2);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
   color: var(--text);
-  transition: opacity var(--dur) var(--ease),
-              transform var(--dur) var(--ease);
+  -webkit-transition: opacity .18s, -webkit-transform .18s;
+  transition: opacity .18s, transform .18s;
 }
 
+/* タップ時のフィードバック: 縮んで薄くなる */
 .header-btn:active {
   opacity: .7;
+  -webkit-transform: scale(.94);
   transform: scale(.94);
 }
 
+/* ヘッダー右側ボタングループ（サウンド・設定） */
 .header-right {
+  display: -webkit-flex;
   display: flex;
   gap: 8px;
+  -webkit-align-items: center;
   align-items: center;
 }
 
+/* ヘッダー中央ロゴ（使う場合は .header-logo をHTMLに追加） */
 .header-logo {
   position: absolute;
   left: 50%;
+  -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
-  pointer-events: none;
+  pointer-events: none; /* クリック不可にしてボタンを妨げない */
+  display: -webkit-flex;
   display: flex;
+  -webkit-align-items: center;
   align-items: center;
 }
 
@@ -186,9 +359,13 @@ input, button, textarea, select {
 
 
 /* ============================================================
-   4. カード・パネル
+   5. カード・パネル（汎用）
+   【使い方】コンテンツカードのベーススタイル。
+   .card-gold を追加すると金色のグロー効果が出る。
    ============================================================ */
 .card {
+  background: var(--panel);
+  /* グラデーションで奥行き感を演出 */
   background: linear-gradient(160deg, var(--panel), var(--panel-2) 50%, var(--panel-3));
   border: 1px solid var(--line);
   border-radius: var(--r-2xl);
@@ -198,10 +375,15 @@ input, button, textarea, select {
   overflow: hidden;
 }
 
+/* ゴールドグロー効果。My IDカードなど特別感を出したい時に使う。
+   ::before 疑似要素でradial-gradientの光を重ねる。            */
 .card-gold::before {
   content: "";
   position: absolute;
-  inset: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    -webkit-radial-gradient(50% -10%, circle, var(--gold-dim), transparent 36%),
+    -webkit-radial-gradient(100% 100%, circle, var(--gold-glow), transparent 28%);
   background:
     radial-gradient(circle at 50% -10%, var(--gold-dim), transparent 36%),
     radial-gradient(circle at 100% 100%, var(--gold-glow), transparent 28%);
@@ -211,14 +393,29 @@ input, button, textarea, select {
 
 
 /* ============================================================
-   5. ボタン
+   6. ボタン（汎用）
+   【使い方】
+     <button class="btn btn-gold">ボタン</button>
+     <button class="btn btn-sm btn-ghost">小さいボタン</button>
+
+   バリエーション:
+     btn-gold   → ゴールドグラデーション（主要アクション）
+     btn-felt   → 水色グラデーション（QR生成など）
+     btn-ghost  → 透明背景（キャンセル・サブアクション）
+     btn-danger → 赤系（削除・リセット）
+     btn-id     → パープル（My ID関連）
+     btn-sm     → 小サイズ（高さ44px）
+     btn-icon   → 正方形アイコンボタン（44x44px）
    ============================================================ */
 .btn {
+  display: -webkit-inline-flex;
   display: inline-flex;
+  -webkit-align-items: center;
   align-items: center;
+  -webkit-justify-content: center;
   justify-content: center;
   gap: 8px;
-  height: 56px;
+  height: 56px;       /* Appleの推奨タップサイズ以上 */
   padding: 0 20px;
   width: 100%;
   border: none;
@@ -228,27 +425,40 @@ input, button, textarea, select {
   font-family: var(--font-ui);
   letter-spacing: .02em;
   cursor: pointer;
-  transition: transform var(--dur) var(--ease),
-              opacity var(--dur) var(--ease);
+  -webkit-transition: -webkit-transform .18s, opacity .18s;
+  transition: transform .18s, opacity .18s;
 }
 
-.btn:active { transform: scale(.96); opacity: .88; }
+/* タップ時のフィードバック: 縮んで薄くなる（気持ちよさ重視） */
+.btn:active {
+  -webkit-transform: scale(.96);
+  transform: scale(.96);
+  opacity: .88;
+}
 
+/* ボタンカラーバリエーション */
 .btn-gold   { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #0a0800; box-shadow: var(--shadow-gold); }
 .btn-felt   { background: linear-gradient(135deg, var(--felt-blue), #a8ffd7); color: #061218; }
 .btn-ghost  { background: var(--panel-2); color: var(--text); border: 1px solid var(--line-2); }
 .btn-danger { background: rgba(255,92,92,.15); color: var(--danger); border: 1px solid rgba(255,92,92,.25); }
 .btn-id     { background: linear-gradient(135deg, var(--id-purple), var(--id-purple-2)); color: #fff; }
-.btn-sm     { height: 44px; font-size: 15px; border-radius: var(--r-md); }
-.btn-icon   { width: 44px; height: 44px; padding: 0; border-radius: var(--r-sm); font-size: 20px; }
+
+/* サイズバリエーション */
+.btn-sm   { height: 44px; font-size: 15px; border-radius: var(--r-md); }
+.btn-icon { width: 44px; height: 44px; padding: 0; border-radius: var(--r-sm); font-size: 20px; }
 
 
 /* ============================================================
-   6. シェアボタン（ホーム・各ページ共通）
+   7. シェアボタン（.shareBtn）
+   【使い方】ホームと各ページのApp Shareボタン共通。
+   サイズはHTMLのpadding・font-sizeで各ページが調整する。
    ============================================================ */
 .shareBtn {
+  display: -webkit-inline-flex;
   display: inline-flex;
+  -webkit-align-items: center;
   align-items: center;
+  -webkit-justify-content: center;
   justify-content: center;
   gap: 6px;
   background: var(--panel);
@@ -258,6 +468,7 @@ input, button, textarea, select {
   font-weight: 700;
   font-family: var(--font-ui);
   cursor: pointer;
+  -webkit-transition: opacity .2s;
   transition: opacity .2s;
 }
 
@@ -265,25 +476,43 @@ input, button, textarea, select {
 
 
 /* ============================================================
-   7. シェアモーダル（ホーム・各ページ共通）
+   8. シェアモーダル（.modalBack / .modal）
+   【使い方】ホームと各ページのApp Shareモーダル共通。
+   common.js の openShareModal() / closeShareModal() と連携。
+
+   構造:
+     .modalBack（全画面オーバーレイ）
+       └ .modal（コンテンツカード）
+           ├ .modalLogoWrap
+           ├ .qrContainer / #qrCodeImg
+           ├ .modalInfo
+           ├ .btnPrimaryShare（共有ボタン）
+           └ .btnCloseShare（閉じるボタン）
    ============================================================ */
 .modalBack {
   position: fixed;
-  inset: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,.85);
-  display: none;
+  display: none; /* openShareModal()でdisplay:flexになる */
+  -webkit-align-items: center;
   align-items: center;
+  -webkit-justify-content: center;
   justify-content: center;
   z-index: 10000;
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
+  backdrop-filter: blur(20px);
+  /* safe-areaぶんのpadding（ノッチ・ホームバーに被らないよう） */
+  padding: 20px;
+  padding-top:    20px;       /* フォールバック */
+  padding-top:    var(--sat);
+  padding-bottom: 10px;       /* フォールバック */
+  padding-bottom: var(--sab);
 }
 
 .modal {
   width: 100%;
   max-width: 380px;
-  max-height: 90vh;
+  max-height: 90vh; /* 縦画面で画面をはみ出さないよう制限 */
   background: #18191d;
   border-radius: var(--r-2xl);
   padding: 32px 24px;
@@ -291,24 +520,23 @@ input, button, textarea, select {
   text-align: center;
   box-shadow: var(--shadow-lg);
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch; /* iOS慣性スクロール */
+  scrollbar-width: none;             /* スクロールバー非表示 */
 }
 
 .modal::-webkit-scrollbar { display: none; }
 
 .modalLogoWrap {
+  display: -webkit-flex;
   display: flex;
+  -webkit-flex-direction: column;
   flex-direction: column;
+  -webkit-align-items: center;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.modalLogo {
-  height: 48px;
-  width: auto;
-  object-fit: contain;
-}
+.modalLogo { height: 48px; width: auto; object-fit: contain; }
 
 .by-text {
   font-size: 11px;
@@ -318,6 +546,7 @@ input, button, textarea, select {
   margin-top: 4px;
 }
 
+/* QRコード表示エリア。白背景でQRを見やすくする。 */
 .qrContainer {
   background: #fff;
   padding: 14px;
@@ -327,16 +556,13 @@ input, button, textarea, select {
   box-shadow: var(--shadow-md);
 }
 
-#qrCodeImg {
-  width: 200px;
-  height: 200px;
-  display: block;
-}
+#qrCodeImg { width: 200px; height: 200px; display: block; }
 
 .modalInfo { margin-bottom: 24px; }
 .modalInfo .mainT { font-size: 15px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
 .modalInfo .subT  { font-size: 12px; color: var(--muted2); font-weight: 600; }
 
+/* 共有ボタン（iOSブルー） */
 .btnPrimaryShare {
   background: #007aff;
   color: #fff;
@@ -349,8 +575,12 @@ input, button, textarea, select {
   margin-bottom: 12px;
   cursor: pointer;
   font-family: var(--font-ui);
+  -webkit-transition: opacity .18s;
+  transition: opacity .18s;
 }
+.btnPrimaryShare:active { opacity: .8; }
 
+/* 閉じるボタン */
 .btnCloseShare {
   background: var(--active-card);
   color: var(--text);
@@ -362,8 +592,12 @@ input, button, textarea, select {
   width: 100%;
   cursor: pointer;
   font-family: var(--font-ui);
+  -webkit-transition: opacity .18s;
+  transition: opacity .18s;
 }
+.btnCloseShare:active { opacity: .8; }
 
+/* 横画面かつ低い画面（iPhone横など）でモーダルをコンパクトに */
 @media (orientation: landscape) and (max-height: 480px) {
   .modal       { padding: 24px 20px; }
   .modalLogo   { height: 38px; }
@@ -373,7 +607,10 @@ input, button, textarea, select {
 
 
 /* ============================================================
-   8. フォーム・入力
+   9. フォーム・入力（.input）
+   【使い方】
+     <input class="input" type="text">
+     <input class="input input-mono" type="text"> ← 等幅フォント
    ============================================================ */
 .input {
   width: 100%;
@@ -386,9 +623,11 @@ input, button, textarea, select {
   font-family: var(--font-ui);
   font-size: 17px;
   outline: none;
-  transition: border-color var(--dur), box-shadow var(--dur);
+  -webkit-transition: border-color .18s, box-shadow .18s;
+  transition: border-color .18s, box-shadow .18s;
 }
 
+/* フォーカス時にラシャ水色で光る */
 .input:focus {
   border-color: rgba(126,224,255,.60);
   box-shadow: 0 0 0 3px rgba(126,224,255,.10);
@@ -397,6 +636,7 @@ input, button, textarea, select {
 .input-mono   { font-family: var(--font-mono); font-size: 22px; font-weight: 800; letter-spacing: .08em; text-align: center; }
 .input-center { text-align: center; }
 
+/* 入力欄のラベルテキスト */
 .label {
   font-size: 13px;
   font-weight: 700;
@@ -408,39 +648,57 @@ input, button, textarea, select {
 
 
 /* ============================================================
-   9. タイポグラフィ
+   10. タイポグラフィ（ユーティリティクラス）
+   【使い方】任意の要素にクラスを付けるだけでスタイルが当たる。
+     <h1 class="text-title">見出し</h1>
+     <span class="text-gold">ゴールドテキスト</span>
    ============================================================ */
-.text-title        { font-size: 28px; font-weight: 900; letter-spacing: .02em; }
-.text-heading      { font-size: 22px; font-weight: 800; }
-.text-body         { font-size: 16px; font-weight: 400; line-height: 1.6; }
-.text-small        { font-size: 13px; color: var(--muted); }
-.text-mono         { font-family: var(--font-mono); letter-spacing: .06em; }
-.text-gold         { color: var(--gold-light); }
-.text-muted        { color: var(--muted); }
-.text-coming-soon  { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.text-title       { font-size: 28px; font-weight: 900; letter-spacing: .02em; }
+.text-heading     { font-size: 22px; font-weight: 800; }
+.text-body        { font-size: 16px; font-weight: 400; line-height: 1.6; }
+.text-small       { font-size: 13px; color: var(--muted); }
+.text-mono        { font-family: var(--font-mono); letter-spacing: .06em; }
+.text-gold        { color: var(--gold-light); }
+.text-muted       { color: var(--muted); }
+.text-coming-soon { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
 
 
 /* ============================================================
-   10. ページレイアウト（サブ画面用）
+   11. スクロールページレイアウト（.page-wrap）
+   【使い方】ヘッダーあり・スクロール可能なサブページ用。
+   フルスクリーンアプリ（スコアボードなど）には不要。
+
+   例: README・お問い合わせ・リンク集ページなど
+
+     <div class="page-wrap">
+       コンテンツ
+     </div>
    ============================================================ */
 .page-wrap {
-  width: min(100%, 560px);
+  width: 100%;
+  max-width: 560px; /* 広い画面でも読みやすい幅に制限 */
   margin: 0 auto;
-  padding:
-    calc(env(safe-area-inset-top)    + 70px)
-    calc(env(safe-area-inset-right)  + 16px)
-    calc(env(safe-area-inset-bottom) + 24px)
-    calc(env(safe-area-inset-left)   + 16px);
+  /* ヘッダー高さ + 余白ぶんのpadding-top */
+  padding-top:    76px;                           /* フォールバック */
+  padding-top:    calc(var(--sat) + 56px + 24px);
+  padding-bottom: 24px;                           /* フォールバック */
+  padding-bottom: calc(var(--sab) + 24px);
+  padding-left:   16px;                           /* フォールバック */
+  padding-left:   calc(var(--sal) + 16px);
+  padding-right:  16px;                           /* フォールバック */
+  padding-right:  calc(var(--sar) + 16px);
 }
 
 
 /* ============================================================
-   11. ユーティリティ
+   12. ユーティリティクラス
+   【使い方】HTMLに直接付けて手軽にスタイルを適用する。
+     <div class="flex-center gap-12">...</div>
    ============================================================ */
 .hide         { display: none !important; }
-.flex         { display: flex; }
-.flex-center  { display: flex; align-items: center; justify-content: center; }
-.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex         { display: -webkit-flex; display: flex; }
+.flex-center  { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
+.flex-between { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; }
 .gap-8        { gap: 8px; }
 .gap-12       { gap: 12px; }
 .gap-16       { gap: 16px; }
@@ -453,14 +711,26 @@ input, button, textarea, select {
 .text-center  { text-align: center; }
 .w-full       { width: 100%; }
 
+/* スコアタップ時などの一瞬の点滅フィードバック。
+   .flash クラスをJSで付け外しして使う。           */
+@-webkit-keyframes ru-flash {
+  0%   { -webkit-transform: scale(.985); opacity: .80; }
+  100% { -webkit-transform: scale(1);    opacity: 1; }
+}
 @keyframes ru-flash {
   0%   { transform: scale(.985); opacity: .80; }
   100% { transform: scale(1);    opacity: 1; }
 }
-.flash { animation: ru-flash .15s var(--ease); }
+.flash { -webkit-animation: ru-flash .15s; animation: ru-flash .15s; }
 
+/* ページ・要素の登場アニメーション。
+   .fadein クラスを付けると下からふわっと出てくる。 */
+@-webkit-keyframes ru-fadein {
+  from { opacity: 0; -webkit-transform: translateY(8px); }
+  to   { opacity: 1; -webkit-transform: translateY(0); }
+}
 @keyframes ru-fadein {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.fadein { animation: ru-fadein .28s var(--ease) both; }
+.fadein { -webkit-animation: ru-fadein .28s both; animation: ru-fadein .28s both; }
