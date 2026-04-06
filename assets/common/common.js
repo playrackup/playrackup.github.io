@@ -153,26 +153,28 @@ if (btn) btn.textContent = next ? ‘🔔’ : ‘🔕’;
 }
 
 /* ============================================================
-bfcache対策（pageshow イベント）
+向き変更時のレイアウト崩れ対策（orientationchange）
 【問題】
-iOS Safariは「戻る」ボタンでページを復元する際、
-bfcache（Back-Forward Cache）を使うことがある。
-このとき onload / DOMContentLoaded は再実行されず、
-向き変更後のレイアウトが崩れた状態のままになることがある。
+iOS Safariは向きを変えた後に別ページへ遷移し、
+戻るボタン（bfcache復元）で戻ると
+position:fixed / 100dvh の再計算が走らず
+レイアウトが崩れることがある。
+また向き変更直後に一瞬白くフラッシュすることがある。
 
 【解決策】
-pageshow イベントの event.persisted が true の場合が
-bfcacheからの復元。この時だけリロードする。
-※ onunload のフックはiOS Safariでは効かないため使わない。
+orientationchange イベントで body を一瞬 display:none にして
+強制的にリフロー（再描画）させる。
+ページを再取得しないので無限ループしない。
 
-参考: https://qiita.com/kyaido/items/5cf9482146b945a4bf67
-
-【注意】
-リロードはlocalStorageのデータを消さないため
-スコアや設定は維持される。
+【なぜ location.reload() を使わないか】
+pageshow イベントでリロードすると
+スコアページでも発火して無限リロードループになるため。
 ============================================================ */
-window.onpageshow = function(e) {
-if (e && e.persisted) {
-window.location.reload();
-}
-};
+window.addEventListener(‘orientationchange’, function() {
+/* display:none で一時的にレンダリングツリーから外し */
+document.body.style.display = ‘none’;
+/* 50ms後に戻すことでブラウザに強制リフローさせる */
+setTimeout(function() {
+document.body.style.display = ‘’;
+}, 50);
+});
