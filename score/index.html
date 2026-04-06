@@ -25,28 +25,29 @@
       background: #0b0b0c;
       overflow: hidden;
       position: fixed;
+      top: 0; left: 0;
       color: #fff;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-flex-direction: column;
-      flex-direction: column;
+      /* display:flex を削除。
+         body flex + createHeader挿入の組み合わせで
+         mainの高さが壊れるため。
+         代わりにmainをposition:fixedで全画面に固定する。 */
     }
 
     * { -webkit-user-select: none; user-select: none; box-sizing: border-box; }
 
     /* ===== メイン =====
-       padding は全て common.css の .has-header main に委譲
-       スコア固有の上書きは不要
+       position:fixed で画面全体を占有。
+       padding は common.css の .has-header main に完全委譲。
+       ヘッダー高さぶんの padding-top が自動で当たる。
     */
     main {
-      -webkit-flex: 1;
-      flex: 1;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: -webkit-flex;
       display: flex;
       -webkit-flex-direction: column;
       flex-direction: column;
       min-height: 0;
-      position: relative;
     }
 
     /* ===== カードグリッド ===== */
@@ -581,7 +582,7 @@
 
   <!-- 読み込み順序（重要）
        1. lz-string  → result-qr.js が圧縮に使うので必ず先に
-       2. common.js  → createHeader・bfcache対策を提供
+       2. common.js  → createHeader・レイアウト崩れ対策を提供
        3. result-qr.js → ResultQR.show() を提供
   -->
 
@@ -592,37 +593,15 @@
   <script src="../assets/common/result-qr.js"></script>
 
   <script>
-    /* ============================================================
-       スコアボード メインスクリプト
-
-       【state オブジェクト構造】
-         state.playerCount  : 現在の人数（2/3/4）
-         state.players[]    : プレイヤー配列
-           .id    : 識別子（1〜4）
-           .name  : 表示名
-           .score : 現在のスコア
-           .wins  : 累計勝利数
-           .race  : レース（目標点）
-         state.winnerId     : 勝者のid（null = ゲーム中）
-
-       【localStorageキー】
-         'pool_score_v29' → state をJSON文字列で保存
-         バージョン番号を上げると古いデータをリセットできる。
-     ============================================================ */
     var KEY = 'pool_score_v29';
     var state = { playerCount: 2, players: [], winnerId: null };
 
-    /* getElementById のショートハンド */
     function $(id) { return document.getElementById(id); }
 
-    /* 向き変更・ウィンドウサイズ変更時に再描画 */
     window.addEventListener('resize', renderAll);
 
-    /* stateをlocalStorageに保存 */
     function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
 
-    /* 起動時のデータ読み込み。
-       保存データがなければ4人分の初期プレイヤーを生成する。 */
     function load() {
       var data = localStorage.getItem(KEY);
       if (data) {
@@ -635,9 +614,6 @@
       renderAll();
     }
 
-    /* カード全体を再描画する。
-       innerHTML をクリアして作り直す方式（シンプルで確実）。
-       設定モーダルのinputも同時に更新する。                  */
     function renderAll() {
       var container = $('cardsContainer');
       if (!container) return;
@@ -649,18 +625,15 @@
 
       activePlayers.forEach(function(p) {
         var card = document.createElement('div');
-        /* リーチ = あと1点で勝利 かつ まだ勝者がいない */
         var isReach  = p.score === p.race - 1 && !state.winnerId;
         var isWinner = state.winnerId === p.id;
         if (isReach) reachCount++;
 
-        /* クラスでリーチ・勝利の視覚状態を切り替える */
         card.className = 'card' + (isWinner ? ' win' : '') + (isReach ? ' reach' : '');
         card.innerHTML =
           '<div class="cardHeader">' +
             '<div class="playerName">' + p.name + '</div>' +
             '<div class="metaRight">' +
-              /* 3人以上は省略表記でスペース節約 */
               '<span class="winsPill">' + (state.playerCount >= 3 ? 'RACE<br>TO:' + p.race : 'RACE TO: ' + p.race) + '</span>' +
               '<span class="totalWinsLabel">' + (state.playerCount >= 3 ? 'WINS:' + p.wins : 'WINS: ' + p.wins) + '</span>' +
             '</div>' +
@@ -672,11 +645,9 @@
         container.appendChild(card);
       });
 
-      /* 全員リーチ = ヒルヒル状態 → 赤フラッシュ背景を表示 */
       $('hillHillOverlay').style.display =
         (reachCount === state.playerCount && state.playerCount > 1) ? 'block' : 'none';
 
-      /* 設定モーダル内のinputも再生成 */
       var inputWrap = $('playerInputs');
       inputWrap.innerHTML = '';
       activePlayers.forEach(function(p) {
@@ -689,30 +660,22 @@
         inputWrap.appendChild(row);
       });
 
-      /* 人数ボタンのアクティブ状態を更新 */
       [2,3,4].forEach(function(n) {
         var btn = $('b' + n);
         if (btn) btn.className = 'countBtn' + (state.playerCount === n ? ' active' : '');
       });
     }
 
-    /* スコア変更処理。
-       delta: +1（タップ・右スワイプ・上スワイプ）
-              -1（左スワイプ・下スワイプ）
-       勝者がいる状態でタップするとコンティニューシートを表示。
-       score が race に達したら勝利演出を開始する。            */
     function handleScore(id, delta) {
       if (state.winnerId) { showContinueSheet(); return; }
       var p = state.players.filter(function(x) { return x.id === id; })[0];
-      p.score = Math.max(0, p.score + delta); /* マイナスにならないよう制限 */
+      p.score = Math.max(0, p.score + delta);
       if (p.score >= p.race && delta > 0) {
         state.winnerId = id;
         save(); renderAll();
-        /* 少し遅延してshakingクラスを付け、振動アニメを開始 */
         setTimeout(function() {
           var winCard = document.querySelector('.card.win');
           if (winCard) winCard.classList.add('shaking');
-          /* 1.5秒後にコンティニューシートを表示 */
           setTimeout(function() { showContinueSheet(); }, 1500);
         }, 100);
         return;
@@ -720,11 +683,6 @@
       save(); renderAll();
     }
 
-    /* ============================================================
-       コンティニューシート
-       勝者が決まった後に表示するシート。
-       「CONTINUE」で次の試合へ、「結果をシェア」でQR生成へ。
-       ============================================================ */
     function showContinueSheet() {
       var winner = state.players.filter(function(p) { return p.id === state.winnerId; })[0];
       if (winner) $('continueLabel').textContent = '🏆 ' + winner.name + ' WIN!';
@@ -735,7 +693,6 @@
       $('continueOverlay').classList.remove('show');
     }
 
-    /* CONTINUEボタン押下。勝者のwinsを+1してスコアをリセット。 */
     function doContinue() {
       hideContinueSheet();
       state.players.forEach(function(p) {
@@ -746,18 +703,12 @@
       save(); renderAll();
     }
 
-    /* 「結果をシェア」ボタン → 満足度入力シートを開く */
     function doOpenSat() {
       hideContinueSheet();
       buildSatGrid();
       $('satOverlay').classList.add('show');
     }
 
-    /* ============================================================
-       満足度チップ（試合の振り返りタグ）
-       複数選択可能。選択状態はselectedSat配列で管理。
-       QR生成時にResultQR.showへ渡される。
-       ============================================================ */
     var SAT_TAGS = [
       { key: 'fun',     label: '楽しかった 😄' },
       { key: 'learn',   label: '学びあった 📚' },
@@ -766,9 +717,8 @@
       { key: 'reflect', label: '反省点あり 🤔' }
     ];
 
-    var selectedSat = []; /* 選択中のkeyを格納する配列 */
+    var selectedSat = [];
 
-    /* 満足度グリッドを初期化して描画する */
     function buildSatGrid() {
       selectedSat = [];
       var grid = $('satGrid');
@@ -777,7 +727,6 @@
         var chip = document.createElement('button');
         chip.className = 'satChip';
         chip.textContent = t.label;
-        /* タップで選択/解除をトグル */
         chip.onclick = function() {
           var idx = selectedSat.indexOf(t.key);
           if (idx === -1) { selectedSat.push(t.key); chip.classList.add('selected'); }
@@ -788,10 +737,6 @@
       $('gamesInput').value = 1;
     }
 
-    /* QR生成処理。
-       result-qr.js の ResultQR.show() にデータを渡す。
-       players配列のキーを短縮しているのはQRコードの容量節約のため:
-         n = name, s = score, w = wins, r = race, wn = winner(0/1) */
     function doGenQR() {
       $('satOverlay').classList.remove('show');
       var activePlayers = state.players.slice(0, state.playerCount);
@@ -800,7 +745,6 @@
         return { n: p.name, s: p.score, w: p.wins, r: p.race, wn: p.id === state.winnerId ? 1 : 0 };
       });
       ResultQR.show({ mode: 'score', players: players, games: games, satisfaction: selectedSat });
-      /* QR生成後もdoContinueと同様にスコアをリセット */
       state.players.forEach(function(p) {
         if (p.id === state.winnerId) p.wins++;
         p.score = 0;
@@ -809,14 +753,9 @@
       save(); renderAll();
     }
 
-    /* ============================================================
-       設定モーダル
-       プレイヤー人数・名前・レース変更とリセット処理を提供する。
-       ============================================================ */
     function openSettings()  { hideResetConfirm(); $('settingsModal').style.display = 'flex'; }
     function closeSettings() { $('settingsModal').style.display = 'none'; }
 
-    /* 設定を保存してモーダルを閉じる */
     function applySettings() {
       state.players.slice(0, state.playerCount).forEach(function(p) {
         p.name = $('inP' + p.id + 'Name').value || p.name;
@@ -825,14 +764,8 @@
       save(); closeSettings(); renderAll();
     }
 
-    /* 人数変更（2/3/4P）。saveはせずrenderAllだけ呼ぶ。
-       設定を閉じた時点でapplySettingsが保存する。         */
     function changeCount(n) { state.playerCount = n; renderAll(); }
 
-    /* リセット確認UI表示。typeで処理を切り替える。
-       score   → スコアのみ0に
-       all     → スコア＋累計勝利数を0に
-       factory → localStorage完全削除してリロード        */
     function showResetConfirm(type) {
       $('mainSettingsUI').style.display = 'none';
       $('resetConfirmUI').style.display = 'block';
@@ -859,24 +792,8 @@
       $('resetConfirmUI').style.display = 'none';
     }
 
-    /* ============================================================
-       タッチイベント
-       各カードにタップ・スワイプのジェスチャーを付ける。
-
-       判定ルール:
-         移動量 < 15px          → タップ → +1
-         横移動が縦より大きい   → 横スワイプ
-           右 (dx > 40)        → +1
-           左 (dx <= 40)       → -1
-         縦移動が横より大きい   → 縦スワイプ
-           上 (dy < -40)       → +1
-           下 (dy >= -40)      → -1
-
-       { passive: true } でスクロールブロックを防ぎ
-       ブラウザのパフォーマンス警告を抑制する。
-       ============================================================ */
     function attachEvents(el, id) {
-      var sx, sy; /* タッチ開始座標 */
+      var sx, sy;
       el.addEventListener('touchstart', function(e) {
         sx = e.touches[0].clientX;
         sy = e.touches[0].clientY;
@@ -884,19 +801,12 @@
       el.addEventListener('touchend', function(e) {
         var dx = e.changedTouches[0].clientX - sx;
         var dy = e.changedTouches[0].clientY - sy;
-        if (Math.abs(dx) < 15 && Math.abs(dy) < 15) handleScore(id, 1);          /* タップ */
-        else if (Math.abs(dx) > Math.abs(dy)) handleScore(id, dx > 40 ? 1 : -1); /* 横スワイプ */
-        else handleScore(id, dy < -40 ? 1 : -1);                                  /* 縦スワイプ */
+        if (Math.abs(dx) < 15 && Math.abs(dy) < 15) handleScore(id, 1);
+        else if (Math.abs(dx) > Math.abs(dy)) handleScore(id, dx > 40 ? 1 : -1);
+        else handleScore(id, dy < -40 ? 1 : -1);
       }, { passive: true });
     }
 
-    /* ============================================================
-       起動シーケンス
-       1. createHeader() でヘッダーを生成（common.jsが提供）
-       2. load() でlocalStorageからstateを読み込み描画
-       createHeader は body.firstChild より前に挿入するため
-       他のDOM操作より先に呼ぶ必要がある。
-       ============================================================ */
     createHeader({
       showBack:     true,
       showSound:    true,
