@@ -12,11 +12,7 @@
   <meta name="theme-color" content="#0b0b0c">
   <title>RACK UP | スコアボード</title>
 
-<!--
-
   <link rel="stylesheet" href="../assets/common/common.css">
-
--->
 
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
 
@@ -29,8 +25,8 @@
       height: 100dvh;
       width: 100vw;
       background: #0b0b0c;
-      overflow: hidden;
-      position: fixed;
+      /* overflow: hidden;
+      position: fixed; */
       top: 0; left: 0;
       color: #fff;
       /* display:flex を削除。
@@ -38,6 +34,8 @@
          mainの高さが壊れるため。
          代わりにmainをposition:fixedで全画面に固定する。 */
     }
+
+
 
     * { -webkit-user-select: none; user-select: none; box-sizing: border-box; }
 
@@ -592,23 +590,11 @@
        3. result-qr.js → ResultQR.show() を提供
   -->
 
-<!--
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-
--->
-
-<!--
 
   <script src="../assets/common/common.js"></script>
 
--->
-
-<!--
-
   <script src="../assets/common/result-qr.js"></script>
-
--->
 
   <script>
     var KEY = 'pool_score_v29';
