@@ -88,9 +88,9 @@
   --dur:  .18s;
   
    /* --- safe-area 変数 --- */
-  --sat: env(safe-area-inset-top,    20px);
+  --sat: env(safe-area-inset-top,    10px);
   --sar: env(safe-area-inset-right,   0px);
-  --sab: env(safe-area-inset-bottom, 20px);
+  --sab: env(safe-area-inset-bottom,  5px);
   --sal: env(safe-area-inset-left,    0px);
 
    
