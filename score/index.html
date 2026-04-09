@@ -83,7 +83,10 @@
     }
 
     @media (orientation: landscape) {
-      .cards.count2, .cards.count3 { grid-template-rows: 1fr; grid-auto-flow: column; }
+
+      .cards.count2 { grid-template-rows: 1fr; grid-template-columns: 1fr 1fr; }
+      .cards.count3 { grid-template-rows: 1fr; grid-template-columns: 1fr 1fr 1fr; }
+
       .cards.count4 { grid-template-rows: 1fr 1fr; grid-template-columns: 1fr 1fr; }
       .count2 .score { font-size: 60svh; }
       .count3 .score { font-size: 50svh; }
