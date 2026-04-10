@@ -655,15 +655,24 @@
 
     load();
 
-    
+    window.addEventListener('orientationchange', function() {
+  setTimeout(function() {
+    document.body.style.height = 'auto';
+    setTimeout(function() {
+      document.body.style.height = '100dvh';
+      renderAll();
+    }, 100);
+  }, 300);
+});
 
-    /* 向き変更後にタッチ判定を再計算する */
+
+    /* 向き変更後にタッチ判定を再計算する 
     window.addEventListener('orientationchange', function() {
       setTimeout(function() {
         renderAll();
       }, 300);
     });
-
+*/
 
 /* どの戻り方でも必ずホームに新規遷移
    スワイプ・WEBバー・戻るボタン全て対応 
