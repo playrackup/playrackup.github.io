@@ -655,14 +655,14 @@
 
     load();
 
-/* スコアページをbfcacheから除外
-   これによりホームに戻る時は必ず新規読み込みになる */
-window.addEventListener('pagehide', function(e) {
-  if (e.persisted) {
-    location.replace('/');
-  }
-});
 
+
+/* どの戻り方でも必ずホームに新規遷移
+   スワイプ・WEBバー・戻るボタン全て対応 */
+history.replaceState(null, '', location.href);
+window.addEventListener('popstate', function() {
+  location.replace('/');
+});
 
 
 
