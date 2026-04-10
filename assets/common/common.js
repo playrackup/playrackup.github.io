@@ -139,7 +139,7 @@ window.addEventListener('pageshow', function(e) {
     /* 少し遅延させてからresizeを発火させる */
     setTimeout(function() {
       window.dispatchEvent(new Event('resize'));
-    }, 300);
+    }, 1300);
   }
 });
 
