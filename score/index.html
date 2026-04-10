@@ -657,14 +657,28 @@
 
 window.addEventListener('orientationchange', function() {
   setTimeout(function() {
-    /* safe-areaの再計算を強制する */
+    var safeTop = parseInt(
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--sat')
+    ) || 0;
+    var main = document.getElementById('appMain');
+    main.style.paddingTop = (safeTop + 56 + 6) + 'px';
+    renderAll();
+  }, 500);
+});
+
+    
+/*
+window.addEventListener('orientationchange', function() {
+  setTimeout(function() {
+   safe-areaの再計算を強制する 
     document.documentElement.style.setProperty(
       '--sat', 'env(safe-area-inset-top)'
     );
     renderAll();
   }, 500);
 });
-
+*/
  
 /*
 window.addEventListener('orientationchange', function() {
