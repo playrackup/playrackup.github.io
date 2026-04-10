@@ -654,6 +654,19 @@
     });
 
     load();
+
+/* スコアページをbfcacheから除外
+   これによりホームに戻る時は必ず新規読み込みになる */
+window.addEventListener('pagehide', function(e) {
+  if (e.persisted) {
+    location.replace('/');
+  }
+});
+
+
+
+
+    
   </script>
 
 </body>
