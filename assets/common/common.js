@@ -122,3 +122,18 @@ window.addEventListener('orientationchange', function() {
   var _ = document.body.scrollTop;
   document.body.scrollTop = _;
 });
+
+/* ============================================================
+   bfcache復元時のレイアウト崩れ対策（pageshow）
+   「戻る」ボタンやスワイプで前のページに戻った時、
+   iOSはbfcache（メモリキャッシュ）からページを復元する。
+   この時、向きが変わっていると凍結状態のレイアウトのまま
+   表示されるため、resizeイベントで再描画を促す。
+   location.reload()は使わない（スコアで無限ループするため）
+   ============================================================ */
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) {
+    window.dispatchEvent(new Event('resize'));
+  }
+});
+
