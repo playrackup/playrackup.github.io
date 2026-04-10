@@ -131,9 +131,16 @@ window.addEventListener('orientationchange', function() {
    表示されるため、resizeイベントで再描画を促す。
    location.reload()は使わない（スコアで無限ループするため）
    ============================================================ */
+
+
+
 window.addEventListener('pageshow', function(e) {
   if (e.persisted) {
-    window.dispatchEvent(new Event('resize'));
+    /* 少し遅延させてからresizeを発火させる */
+    setTimeout(function() {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
   }
 });
+
 
