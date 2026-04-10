@@ -523,8 +523,24 @@ html, body {
       if (mainNote)  mainNote.textContent = note;
     }
 
+    
+
     applyCardState();
   }());
+
+  /* bfcache復元時にリロード（ホーム専用）
+     スコアで向きを変えて戻った時のレイアウト崩れを防ぐ */
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+      window.location.reload();
+    }
+  });
+
+
+
+
+
+  
 </script>
 
 </body>
