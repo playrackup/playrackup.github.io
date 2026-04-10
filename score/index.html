@@ -655,7 +655,19 @@
 
     load();
 
-    window.addEventListener('orientationchange', function() {
+window.addEventListener('orientationchange', function() {
+  setTimeout(function() {
+    var main = document.getElementById('appMain');
+    main.style.paddingTop = '';
+    renderAll();
+  }, 300);
+});
+
+
+
+    
+
+/*    window.addEventListener('orientationchange', function() {
   setTimeout(function() {
     document.body.style.height = 'auto';
     setTimeout(function() {
@@ -665,6 +677,7 @@
   }, 300);
 });
 
+*/
 
     /* 向き変更後にタッチ判定を再計算する 
     window.addEventListener('orientationchange', function() {
