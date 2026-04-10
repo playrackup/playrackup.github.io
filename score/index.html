@@ -657,16 +657,24 @@
 
 window.addEventListener('orientationchange', function() {
   setTimeout(function() {
+    /* safe-areaの再計算を強制する */
+    document.documentElement.style.setProperty(
+      '--sat', 'env(safe-area-inset-top)'
+    );
+    renderAll();
+  }, 500);
+});
+
+ 
+/*
+window.addEventListener('orientationchange', function() {
+  setTimeout(function() {
     var main = document.getElementById('appMain');
     main.style.paddingTop = '';
     renderAll();
   }, 300);
 });
-
-
-
-    
-
+*/
 /*    window.addEventListener('orientationchange', function() {
   setTimeout(function() {
     document.body.style.height = 'auto';
