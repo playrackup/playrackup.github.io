@@ -108,11 +108,7 @@ function toggleSound() {
 
 
 
-window.addEventListener('orientationchange', function() {
-  setTimeout(function() {
-    window.dispatchEvent(new Event('resize'));
-  }, 400);
-});
+
 /* ============================================================
    向き変更時のレイアウト崩れ対策（orientationchange）
 
