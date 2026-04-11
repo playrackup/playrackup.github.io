@@ -129,6 +129,22 @@ setSoundOn(next);
 var btn = document.getElementById('ru-soundBtn');
 if (btn) btn.textContent = next ? '🔔' : '🔕';
 }
+window.addEventListener('orientationchange', function() {
+  var root = document.documentElement;
+
+  root.style.setProperty('--sat', '59px');
+  root.style.setProperty('--sar', '59px');
+  root.style.setProperty('--sab', '34px');
+  root.style.setProperty('--sal', '59px');
+
+  setTimeout(function() {
+    root.style.removeProperty('--sat');
+    root.style.removeProperty('--sar');
+    root.style.removeProperty('--sab');
+    root.style.removeProperty('--sal');
+    window.dispatchEvent(new Event('resize'));
+  }, 350);
+});
 
 /* ============================================================
 向き変更時のレイアウト・タッチ座標ズレ対策
