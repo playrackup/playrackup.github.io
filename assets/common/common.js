@@ -106,6 +106,13 @@ function toggleSound() {
   if (btn) btn.textContent = next ? '🔔' : '🔕';
 }
 
+
+
+window.addEventListener('orientationchange', function() {
+  setTimeout(function() {
+    window.dispatchEvent(new Event('resize'));
+  }, 400);
+});
 /* ============================================================
    向き変更時のレイアウト崩れ対策（orientationchange）
 
@@ -113,13 +120,14 @@ function toggleSound() {
    代わりに scrollTop を読み書きするだけで
    ブラウザに静かに再計算させる。
    ============================================================ */
+/*
 window.addEventListener('orientationchange', function() {
-  /* scrollTop の読み書きでレイアウトの再計算を促す。
-     画面の書き換えを伴わないので点滅しない。 */
+   scrollTop の読み書きでレイアウトの再計算を促す。
+     画面の書き換えを伴わないので点滅しない。 
   var _ = document.body.scrollTop;
   document.body.scrollTop = _;
 });
-
+*/
 /* ============================================================
    bfcache復元時のレイアウト崩れ対策（pageshow）
    「戻る」ボタンやスワイプで前のページに戻った時、
