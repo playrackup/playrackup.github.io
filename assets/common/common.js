@@ -24,11 +24,11 @@ const・let・アロー関数は使わない。
 サウンド状態管理
 ============================================================ */
 function isSoundOn() {
-return localStorage.getItem(‘ru_sound’) !== ‘off’;
+return localStorage.getItem('ru_sound') !== 'off';
 }
 
 function setSoundOn(val) {
-localStorage.setItem(‘ru_sound’, val ? ‘on’ : ‘off’);
+localStorage.setItem('ru_sound', val ? 'on' : 'off');
 }
 
 /* ============================================================
@@ -46,21 +46,21 @@ safe-area適用タイミングを自分で制御できる。
 ============================================================ */
 function syncSafeAreaVars() {
 var root = document.documentElement;
-var el = document.createElement(‘div’);
-el.style.position = ‘fixed’;
-el.style.top = ‘env(safe-area-inset-top, 0px)’;
-el.style.left = ‘env(safe-area-inset-left, 0px)’;
-el.style.right = ‘env(safe-area-inset-right, 0px)’;
-el.style.bottom = ‘env(safe-area-inset-bottom, 0px)’;
-el.style.visibility = ‘hidden’;
-el.style.pointerEvents = ‘none’;
+var el = document.createElement('div');
+el.style.position = 'fixed';
+el.style.top = 'env(safe-area-inset-top, 0px)';
+el.style.left = 'env(safe-area-inset-left, 0px)';
+el.style.right = 'env(safe-area-inset-right, 0px)';
+el.style.bottom = 'env(safe-area-inset-bottom, 0px)';
+el.style.visibility = 'hidden';
+el.style.pointerEvents = 'none';
 document.body.appendChild(el);
 
 var computed = getComputedStyle(el);
-root.style.setProperty(’–sat’, computed.top    || ‘0px’);
-root.style.setProperty(’–sar’, computed.right  || ‘0px’);
-root.style.setProperty(’–sab’, computed.bottom || ‘0px’);
-root.style.setProperty(’–sal’, computed.left   || ‘0px’);
+root.style.setProperty('–sat', computed.top    || '0px');
+root.style.setProperty('–sar', computed.right  || '0px');
+root.style.setProperty('–sab', computed.bottom || '0px');
+root.style.setProperty('–sal', computed.left   || '0px');
 
 document.body.removeChild(el);
 }
@@ -75,38 +75,38 @@ var showSound    = options.showSound    !== false;
 var showSettings = options.showSettings !== false;
 var onSettings   = options.onSettings   || null;
 
-if (document.querySelector(’.app-header’)) return;
+if (document.querySelector('.app-header')) return;
 
-var soundIcon = isSoundOn() ? ‘🔔’ : ‘🔕’;
+var soundIcon = isSoundOn() ? '🔔' : '🔕';
 
 var backBtn = showBack
-? ‘<button class="header-btn" onclick="goBack()" aria-label="戻る">＜</button>’
-: ‘<div class="header-btn" style="visibility:hidden"></div>’;
+? '<button class="header-btn" onclick="goBack()" aria-label="戻る">＜</button>'
+: '<div class="header-btn" style="visibility:hidden"></div>';
 
 var soundBtn = showSound
-? ‘<button class="header-btn" id="ru-soundBtn" onclick="toggleSound()" aria-label="サウンド">’ + soundIcon + ‘</button>’
-: ‘’;
+? '<button class="header-btn" id="ru-soundBtn" onclick="toggleSound()" aria-label="サウンド">' + soundIcon + '</button>'
+: '';
 
 var settingsBtn = showSettings
-? ‘<button class="header-btn" id="ru-settingsBtn" aria-label="設定">⚙️</button>’
-: ‘’;
+? '<button class="header-btn" id="ru-settingsBtn" aria-label="設定">⚙️</button>'
+: '';
 
-var header = document.createElement(‘header’);
-header.className = ‘app-header’;
+var header = document.createElement('header');
+header.className = 'app-header';
 header.innerHTML =
 backBtn +
-‘<div class="header-right">’ +
+'<div class="header-right">' +
 soundBtn +
 settingsBtn +
-‘</div>’;
+'</div>';
 
 document.body.insertBefore(header, document.body.firstChild);
-document.body.classList.add(‘has-header’);
+document.body.classList.add('has-header');
 
 if (showSettings && onSettings) {
-var btn = document.getElementById(‘ru-settingsBtn’);
+var btn = document.getElementById('ru-settingsBtn');
 if (btn) {
-btn.addEventListener(‘click’, function() {
+btn.addEventListener('click', function() {
 onSettings();
 });
 }
@@ -117,7 +117,7 @@ onSettings();
 戻るボタン処理（goBack）
 ============================================================ */
 function goBack() {
-location.replace(’/’);
+location.replace('/');
 }
 
 /* ============================================================
@@ -126,8 +126,8 @@ location.replace(’/’);
 function toggleSound() {
 var next = !isSoundOn();
 setSoundOn(next);
-var btn = document.getElementById(‘ru-soundBtn’);
-if (btn) btn.textContent = next ? ‘🔔’ : ‘🔕’;
+var btn = document.getElementById('ru-soundBtn');
+if (btn) btn.textContent = next ? '🔔' : '🔕';
 }
 
 /* ============================================================
@@ -139,25 +139,25 @@ if (btn) btn.textContent = next ? ‘🔔’ : ‘🔕’;
    → タッチ座標とレイアウトを同タイミングでシフトさせる
 1. 350ms後: syncSafeAreaVars()で実際のenv()値に正確に戻す
    ============================================================ */
-   window.addEventListener(‘orientationchange’, function() {
+   window.addEventListener('orientationchange', function() {
    var root = document.documentElement;
 
 /* Step1: 回転開始直後に固定値を先行適用 */
-root.style.setProperty(’–sat’, ‘59px’);
-root.style.setProperty(’–sar’, ‘59px’);
-root.style.setProperty(’–sab’, ‘34px’);
-root.style.setProperty(’–sal’, ‘59px’);
+root.style.setProperty('–sat', '59px');
+root.style.setProperty('–sar', '59px');
+root.style.setProperty('–sab', '34px');
+root.style.setProperty('–sal', '59px');
 
 /* Step2: 回転完了後に実際の値で上書き */
 setTimeout(function() {
 syncSafeAreaVars();
-window.dispatchEvent(new Event(‘resize’));
+window.dispatchEvent(new Event('resize'));
 }, 350);
 });
 
 /* ============================================================
 初期化時にsafe-area変数を同期
 ============================================================ */
-window.addEventListener(‘DOMContentLoaded’, function() {
+window.addEventListener('DOMContentLoaded', function() {
 syncSafeAreaVars();
 });
