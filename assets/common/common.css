@@ -131,10 +131,15 @@ input, button, textarea, select {
 .app-header {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 1000;
-  height: calc(env(safe-area-inset-top) + 56px);
-  padding-top: env(safe-area-inset-top);
-  padding-left:  calc(env(safe-area-inset-left)  + 12px);
+
+ /*  z-index: 1000; height: calc(env(safe-area-inset-top) + 56px);
+  padding-top: env(safe-area-inset-top);  */
+ height: calc(var(--sat) + 56px);
+padding-top: var(--sat);
+   
+   
+   
+   padding-left:  calc(env(safe-area-inset-left)  + 12px);
   padding-right: calc(env(safe-area-inset-right) + 12px);
   display: flex;
   align-items: center;
@@ -147,7 +152,10 @@ input, button, textarea, select {
 
 .has-header main,
 .has-header .page-body {
-  padding-top: calc(env(safe-area-inset-top) + 56px);
+/*  padding-top: calc(env(safe-area-inset-top) + 56px);*/
+padding-top: calc(var(--sat) + 56px);
+
+
 }
 
 .header-btn {
