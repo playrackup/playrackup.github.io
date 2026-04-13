@@ -34,10 +34,11 @@
   display: flex;
   flex-direction: column;
   padding: 6px;
-  padding-left:   calc(var(--sal) + 6px);
-  padding-right:  calc(var(--sar) + 6px);
-  padding-top:    calc(var(--sat) + 56px + 6px);
-  padding-bottom: calc(var(--sab) + 6px);
+  padding-left:  calc(env(safe-area-inset-left)  + 6px);
+padding-right: calc(env(safe-area-inset-right) + 6px);
+padding-top:   calc(env(safe-area-inset-top)   + 56px + 6px);
+padding-bottom: calc(env(safe-area-inset-bottom) + 6px);
+
   min-height: 0;
   position: relative;
 }
