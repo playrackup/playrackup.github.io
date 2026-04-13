@@ -1,0 +1,482 @@
+/* ============================================================
+   RACK UP — Design System  common.css
+   ナベクリエイト / playrackup.github.io
+   ============================================================ */
+
+
+/* ============================================================
+   1. カラー変数
+   ============================================================ */
+:root {
+
+  /* --- 背景 --- */
+  --bg:         #08090c;
+  --bg-base:    #07090d;
+  --bg-mid:     #0d1018;
+  --bg-surface: #111520;
+
+  /* --- パネル --- */
+  --panel:      #13151b;
+  --panel-soft: #101217;
+  --panel-dim:  #0d0f14;
+  --panel-2:    #1c2233;
+  --panel-3:    #111825;
+  --active-card:#20232d;
+  --active-card2:#1b1e27;
+
+  /* --- ボーダー --- */
+  --line:       rgba(255,255,255,.08);
+  --line-2:     rgba(255,255,255,.13);
+  --line-dim:   rgba(255,255,255,.04);
+
+  /* --- テキスト --- */
+  --text:       #ffffff;
+  --muted:      rgba(255,255,255,.72);
+  --muted2:     rgba(255,255,255,.42);
+  --muted3:     rgba(255,255,255,.26);
+
+  /* --- ゴールド・IDアクセント --- */
+  --gold:           #c8972a;
+  --gold-light:     #e8b84b;
+  --gold-dim:       rgba(200,151,42,.18);
+  --gold-glow:      rgba(232,184,75,.10);
+  --idBg:           linear-gradient(180deg,#5a4110,#2a1f0f);
+  --idBorder:       rgba(242,201,76,.45);
+  --idText:         #fff3c0;
+  --idSub:          rgba(255,244,199,.88);
+  --comingText:     #ffcf66;
+
+  /* --- スコアタイル --- */
+  --scoreBg:    linear-gradient(180deg,#2b2f3f,#1a1d25);
+  --scoreBorder:rgba(255,255,255,.11);
+
+  /* --- ラシャ水色 --- */
+  --felt-blue:      #7ee0ff;
+  --felt-blue-dim:  rgba(126,224,255,.12);
+
+  /* --- ラシャ緑 --- */
+  --felt-green:     #4caf72;
+  --felt-green-dim: rgba(76,175,114,.10);
+
+  /* --- ID専用パープル --- */
+  --id-purple:  #7c3aed;
+  --id-purple-2:#6d28d9;
+
+  /* --- 危険 --- */
+  --danger:     #ff5c5c;
+
+  /* --- シャドウ --- */
+  --shadow-sm:  0 4px 12px rgba(0,0,0,.30);
+  --shadow-md:  0 12px 28px rgba(0,0,0,.40);
+  --shadow-lg:  0 24px 50px rgba(0,0,0,.50);
+  --shadow-gold:0 8px 24px rgba(200,151,42,.18);
+
+  /* --- 角丸 --- */
+  --r-xs:  8px;
+  --r-sm:  12px;
+  --r-md:  16px;
+  --r-lg:  20px;
+  --r-xl:  26px;
+  --r-2xl: 32px;
+
+  /* --- フォント --- */
+  --font-ui:   -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* --- トランジション --- */
+  --ease: cubic-bezier(.22,.68,0,1.2);
+  --dur:  .18s;
+  
+   /* --- safe-area 変数 --- */
+  --sat: env(safe-area-inset-top,    10px);
+  --sar: env(safe-area-inset-right,   0px);
+  --sab: env(safe-area-inset-bottom,  5px);
+  --sal: env(safe-area-inset-left,    0px);
+
+   
+}
+
+
+/* ============================================================
+   2. リセット・ベース
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input, button, textarea, select {
+  font-family: inherit;
+}
+
+
+/* ============================================================
+   3. ヘッダー（common.jsと連携・サブ画面用）
+   ============================================================ */
+.app-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+
+ /*  z-index: 1000; height: calc(env(safe-area-inset-top) + 56px);
+  padding-top: env(safe-area-inset-top);  */
+ height: calc(var(--sat) + 56px);
+padding-top: var(--sat);
+   
+   
+   
+   padding-left:  calc(env(safe-area-inset-left)  + 12px);
+  padding-right: calc(env(safe-area-inset-right) + 12px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(8,9,12,.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+
+.has-header main,
+.has-header .page-body {
+/*  padding-top: calc(env(safe-area-inset-top) + 56px);*/
+padding-top: calc(var(--sat) + 56px);
+
+
+}
+
+.header-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line-2);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  color: var(--text);
+  transition: opacity var(--dur) var(--ease),
+              transform var(--dur) var(--ease);
+}
+
+.header-btn:active {
+  opacity: .7;
+  transform: scale(.94);
+}
+
+.header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.header-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.header-logo img {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+}
+
+
+/* ============================================================
+   4. カード・パネル
+   ============================================================ */
+.card {
+  background: linear-gradient(160deg, var(--panel), var(--panel-2) 50%, var(--panel-3));
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--shadow-md);
+  padding: 22px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-gold::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% -10%, var(--gold-dim), transparent 36%),
+    radial-gradient(circle at 100% 100%, var(--gold-glow), transparent 28%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+
+/* ============================================================
+   5. ボタン
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 56px;
+  padding: 0 20px;
+  width: 100%;
+  border: none;
+  border-radius: var(--r-lg);
+  font-size: 17px;
+  font-weight: 900;
+  font-family: var(--font-ui);
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: transform var(--dur) var(--ease),
+              opacity var(--dur) var(--ease);
+}
+
+.btn:active { transform: scale(.96); opacity: .88; }
+
+.btn-gold   { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #0a0800; box-shadow: var(--shadow-gold); }
+.btn-felt   { background: linear-gradient(135deg, var(--felt-blue), #a8ffd7); color: #061218; }
+.btn-ghost  { background: var(--panel-2); color: var(--text); border: 1px solid var(--line-2); }
+.btn-danger { background: rgba(255,92,92,.15); color: var(--danger); border: 1px solid rgba(255,92,92,.25); }
+.btn-id     { background: linear-gradient(135deg, var(--id-purple), var(--id-purple-2)); color: #fff; }
+.btn-sm     { height: 44px; font-size: 15px; border-radius: var(--r-md); }
+.btn-icon   { width: 44px; height: 44px; padding: 0; border-radius: var(--r-sm); font-size: 20px; }
+
+
+/* ============================================================
+   6. シェアボタン（ホーム・各ページ共通）
+   ============================================================ */
+.shareBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: var(--r-md);
+  font-weight: 700;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: opacity .2s;
+}
+
+.shareBtn:active { opacity: .7; }
+
+
+/* ============================================================
+   7. シェアモーダル（ホーム・各ページ共通）
+   ============================================================ */
+.modalBack {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
+}
+
+.modal {
+  width: 100%;
+  max-width: 380px;
+  max-height: 90vh;
+  background: #18191d;
+  border-radius: var(--r-2xl);
+  padding: 32px 24px;
+  border: 1px solid var(--line-2);
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.modal::-webkit-scrollbar { display: none; }
+
+.modalLogoWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modalLogo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.by-text {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted2);
+  letter-spacing: .12em;
+  margin-top: 4px;
+}
+
+.qrContainer {
+  background: #fff;
+  padding: 14px;
+  border-radius: var(--r-xl);
+  display: inline-block;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+#qrCodeImg {
+  width: 200px;
+  height: 200px;
+  display: block;
+}
+
+.modalInfo { margin-bottom: 24px; }
+.modalInfo .mainT { font-size: 15px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+.modalInfo .subT  { font-size: 12px; color: var(--muted2); font-weight: 600; }
+
+.btnPrimaryShare {
+  background: #007aff;
+  color: #fff;
+  border: none;
+  padding: 18px;
+  border-radius: var(--r-lg);
+  font-size: 17px;
+  font-weight: 900;
+  width: 100%;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+
+.btnCloseShare {
+  background: var(--active-card);
+  color: var(--text);
+  border: none;
+  padding: 18px;
+  border-radius: var(--r-lg);
+  font-size: 17px;
+  font-weight: 900;
+  width: 100%;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+
+@media (orientation: landscape) and (max-height: 480px) {
+  .modal       { padding: 24px 20px; }
+  .modalLogo   { height: 38px; }
+  .qrContainer { margin-bottom: 15px; }
+  #qrCodeImg   { width: 140px; height: 140px; }
+}
+
+
+/* ============================================================
+   8. フォーム・入力
+   ============================================================ */
+.input {
+  width: 100%;
+  height: 54px;
+  padding: 0 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-2);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 17px;
+  outline: none;
+  transition: border-color var(--dur), box-shadow var(--dur);
+}
+
+.input:focus {
+  border-color: rgba(126,224,255,.60);
+  box-shadow: 0 0 0 3px rgba(126,224,255,.10);
+}
+
+.input-mono   { font-family: var(--font-mono); font-size: 22px; font-weight: 800; letter-spacing: .08em; text-align: center; }
+.input-center { text-align: center; }
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   9. タイポグラフィ
+   ============================================================ */
+.text-title        { font-size: 28px; font-weight: 900; letter-spacing: .02em; }
+.text-heading      { font-size: 22px; font-weight: 800; }
+.text-body         { font-size: 16px; font-weight: 400; line-height: 1.6; }
+.text-small        { font-size: 13px; color: var(--muted); }
+.text-mono         { font-family: var(--font-mono); letter-spacing: .06em; }
+.text-gold         { color: var(--gold-light); }
+.text-muted        { color: var(--muted); }
+.text-coming-soon  { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+
+
+/* ============================================================
+   10. ページレイアウト（サブ画面用）
+   ============================================================ */
+.page-wrap {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding:
+    calc(env(safe-area-inset-top)    + 70px)
+    calc(env(safe-area-inset-right)  + 16px)
+    calc(env(safe-area-inset-bottom) + 24px)
+    calc(env(safe-area-inset-left)   + 16px);
+}
+
+
+/* ============================================================
+   11. ユーティリティ
+   ============================================================ */
+.hide         { display: none !important; }
+.flex         { display: flex; }
+.flex-center  { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.gap-8        { gap: 8px; }
+.gap-12       { gap: 12px; }
+.gap-16       { gap: 16px; }
+.mt-8         { margin-top: 8px; }
+.mt-12        { margin-top: 12px; }
+.mt-16        { margin-top: 16px; }
+.mb-8         { margin-bottom: 8px; }
+.mb-12        { margin-bottom: 12px; }
+.mb-16        { margin-bottom: 16px; }
+.text-center  { text-align: center; }
+.w-full       { width: 100%; }
+
+@keyframes ru-flash {
+  0%   { transform: scale(.985); opacity: .80; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.flash { animation: ru-flash .15s var(--ease); }
+
+@keyframes ru-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fadein { animation: ru-fadein .28s var(--ease) both; }
